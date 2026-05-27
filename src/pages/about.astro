@@ -1,14 +1,41 @@
 ---
 import Layout from "../layouts/Layout.astro";
 
+import Overskrift from "../components/text/overskrift.astro";
+import Titel from "../components/text/titel.astro";
+import Underoverskrift from "../components/text/underoverskrift.astro";
+import Brodtekst from "../components/text/brodtekst.astro";
+
 import Nav from "../components/UI/nav.astro";
 import Footer from "../components/UI/footer.astro";
 ---
 
 <Layout>
-  <div class="grid gap-25">
+  <div>
     <Nav />
 
+    <div class="mx-auto max-w-7xl grid gap-15 py-15">
+    <!-- indsæt visuelt indhold -->
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-15 xl:px-0 px-10">
+        <div>
+          <Titel>About</Titel>
+          <Underoverskrift>
+            <h3>hello, my name is Christine</h3>
+            <h3>I am a Coded Designer</h3>
+          </Underoverskrift>
+        </div>
+        <Brodtekst>
+          <p>I am a coded designer, and I work with digital experiences where technology and creativity merge. I use code as a design tool.</p>
+          <p>I have experience working both independently and in interdisciplinary teams. I am especially motivated when I can help turn ideas into something people can interact with and feel, and I thrive best in projects where I can experiment my way forward.</p>
+          <p>At the moment, I am particularly interested in interaction and gamification as ways to create engaging and meaningful digital experiences.</p>
+          <p>I am always open to new projects and collaborations — especially those that challenge conventional ways of using technology.</p>
+          </Brodtekst>
+      </div>
+      <div class="flex justify-center px-10">
+        <img src="some/figur.svg" />
+      </div>
+    </div> 
     <Footer />
   </div>
 </Layout>

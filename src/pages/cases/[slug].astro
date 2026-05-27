@@ -4,6 +4,8 @@ import Nav from "../../components/UI/nav.astro";
 import Footer from "../../components/UI/footer.astro";
 import Knap from "../../components/UI/knap.astro";
 
+import Img from "../../components/work/img.astro";
+
 import Overskrift from "../../components/text/overskrift.astro";
 import Underoverskrift from "../../components/text/underoverskrift.astro";
 import Brodtekst from "../../components/text/brodtekst.astro";
@@ -22,22 +24,25 @@ const { titel, gif, text, imgdisplay, date, programs, url } = caseData;
 ---
 
 <Layout>
-  <Nav />
-  <div class="mx-auto max-w-7xl grid gap-25 pb-25">
-    <div class="grid gap-5 place-items-center">
-      <img src={gif} alt={titel} />
-      {url && <Knap url={url} tekst="try it yourself" />}
-    </div>
-    <!-- tekst indhold -->
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-15 xl:px-0 px-5">
-      <div>
-        <Overskrift><h2>{titel}</h2></Overskrift>
-        <Underoverskrift><h3>{date}</h3></Underoverskrift>
-        <Underoverskrift><h3>{programs.join(", ")}</h3></Underoverskrift>
+  <div>
+    <Nav />
+    <div class="mx-auto max-w-7xl grid gap-25 pb-25">
+      <div class="grid gap-5 place-items-center">
+        <img src={gif} alt={titel} />
+        {url && <Knap url={url} tekst="try it yourself" />}
       </div>
-      <Brodtekst>{text.map((paragraph) => <p>{paragraph}</p>)}</Brodtekst>
+      <!-- tekst indhold -->
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-15 xl:px-0 px-5">
+        <div>
+          <Overskrift><h2>{titel}</h2></Overskrift>
+          <Underoverskrift><h3>{date}</h3></Underoverskrift>
+          <Underoverskrift><h3>{programs.join(", ")}</h3></Underoverskrift>
+        </div>
+        <Brodtekst>{text.map((paragraph) => <p>{paragraph}</p>)}</Brodtekst>
+      </div>
     </div>
+    <Img images={imgdisplay}></Img>
+    <Footer />
   </div>
-  <Footer />
 </Layout>

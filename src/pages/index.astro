@@ -1,6 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
+
 import Overskrift from "../components/text/overskrift.astro";
+import Titel from "../components/text/titel.astro";
 import Underoverskrift from "../components/text/underoverskrift.astro";
 import Brodtekst from "../components/text/brodtekst.astro";
 
@@ -14,9 +16,10 @@ import Footer from "../components/UI/footer.astro";
     <Nav />
 
     <div class="mx-auto max-w-9xl grid gap-5">
-      <Overskrift>
-        <h2>Work</h2>
-      </Overskrift>
+      <div class="2xl:px-0 px-10">
+        <Titel>Work</Titel>
+      </div>
+      
       <Work />
     </div>
 
