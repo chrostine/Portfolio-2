@@ -1,0 +1,19 @@
+---
+import Case from "./case.astro";
+import { casearray } from "../../scripts/casearray";
+---
+
+<div>
+  {
+    casearray.map((c) => (
+      <Case
+        href={`/cases/${c.slug}`}
+        gif={c.gif}
+        gifimg={c.gifImg}
+        titel={c.titel}
+        tekst={c.displayText}
+        programs={c.programs}
+      />
+    ))
+  }
+</div>

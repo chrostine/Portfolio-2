@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+/* standard farver bg+txt */
+body {
+    background-color: var(--color-hvid);
+    color: var(--color-sort);
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* import af fonte */
+
+@font-face {
+    font-family: "GolosText";
+    font-weight: 400;
+    font-style: normal;
+    src: url("/fonts/GolosText-Regular.ttf");
+}
+
+@font-face {
+    font-family: "ChivoMono";
+    font-weight: 400;
+    font-style: normal;
+    src: url("/fonts/ChivoMono-Regular.ttf");
+}
+
+@font-face {
+    font-family: "BowlbyOne";
+    font-weight: 400;
+    font-style: normal;
+    src: url("/fonts/BowlbyOne-Regular.ttf");
+}
+
+/* globale variabler */
+
+:root {
+  --color-sort: #0c0120;
+  --color-hvid: #fffef9;
+--color-green: #C3F079;
+
+  --font-titel: "BowlbyOne", sans-serif;
+  --font-underoverskrift: "ChivoMono", monospace;
+  --font-brodtekst: "GolosText", sans-serif;
+}
+
+@theme {
+  /* farver */
+  --color-sort: var(--color-sort);
+  --color-hvid: var(--color-hvid);
+  --color-green: var(--color-green);
+
+  /* fonte */
+  --font-titel: "BowlbyOne", sans-serif;
+  --font-underoverskrift: "ChivoMono", monospace;
+  --font-brodtekst: "GolosText", sans-serif;
+}
+
+@layer base {
+    h1 {
+        @apply uppercase;
+        font-family: var(--font-titel);
+    }
+    h2 {
+        font-family: var(--font-titel);
+    }
+    h3 {
+        @apply lowercase;
+        font-family: var(--font-underoverskrift);
+    }
+    p {
+        font-family: var(--font-brodtekst);
+    }
+}
+
+@layer utilities {
+  .max-w-8xl {
+    max-width: 88rem; 
+  }
+  .max-w-9xl {
+    max-width: 96rem; 
+  }
+}

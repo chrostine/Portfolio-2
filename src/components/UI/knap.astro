@@ -1,0 +1,13 @@
+---
+const { tekst, url } = Astro.props;
+---
+
+<a href=`${url}`>
+  <button class="group cursor-pointer">
+    <h3
+      class="uppercase before:content-['['] after:content-[']'] group-hover:before:content-['>'] group-hover:after:content-['<']"
+    >
+      {tekst}
+    </h3>
+  </button>
+</a>

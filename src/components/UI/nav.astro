@@ -1,0 +1,15 @@
+---
+import Knap from "./knap.astro";
+
+import Overskrift from "../text/overskrift.astro";
+---
+
+<div class="flex justify-between py-5 px-5 lg:px-10 xl:px-20">
+  <a href="../../">
+    <Overskrift>
+      <h2>chrostine.work</h2>
+    </Overskrift>
+  </a>
+  <Knap tekst="about" url="../about" />
+  <Knap tekst="contact" />
+</div>
