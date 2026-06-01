@@ -28,21 +28,24 @@ const { titel, gif, text, imgdisplay, date, programs, url } = caseData;
     <Nav />
     <div class="mx-auto max-w-7xl grid gap-25 pb-25">
       <div class="grid gap-5 place-items-center">
-        <img src={gif} alt={titel} />
+        <img src={gif} alt={titel} class="border-sort border-1" />
         {url && <Knap url={url} tekst="try it yourself" />}
       </div>
       <!-- tekst indhold -->
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-15 xl:px-0 px-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-15 px-5">
         <div>
           <Overskrift><h2>{titel}</h2></Overskrift>
           <Underoverskrift><h3>{date}</h3></Underoverskrift>
           <Underoverskrift><h3>{programs.join(", ")}</h3></Underoverskrift>
         </div>
-        <Brodtekst>{text.map((paragraph) => <p>{paragraph}</p>)}</Brodtekst>
+        <div class="md:px-0 px-10">
+          <Brodtekst>{text.map((paragraph) => <p>{paragraph}</p>)}</Brodtekst>
+        </div>
       </div>
+      <Img images={imgdisplay} />
     </div>
-    <Img images={imgdisplay}></Img>
+
     <Footer />
   </div>
 </Layout>

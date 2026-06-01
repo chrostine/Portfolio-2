@@ -66,8 +66,8 @@ body {
 /* globale variabler */
 
 :root {
-  --color-sort: #0c0120;
-  --color-hvid: #fffef9;
+  --color-sort: #131313;
+  --color-hvid: #f7f7f7;
   --color-green: #C3F079;
 
   --font-overskrift: "GasoekOne", sans-serif;

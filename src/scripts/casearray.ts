@@ -13,19 +13,19 @@ export type Case = {
 };
 
 export const casearray: Case[] = [
-    {
-        slug: "aaben",
-        url: "https://aaben-perlin.netlify.app/",
-        titel: `Label generator for "Åben øl"`,
-        date: "2026-03-06",
-        programs: [
-            "Figma",
-            "p5.js",
-            "Three.js",
-            "Shoelace",
-            "3D",
-            "Photoshop",
-        ],
+  {
+    slug: "aaben",
+    url: "https://aaben-perlin.netlify.app/",
+    titel: `Label generator for "Åben øl"`,
+    date: "2026-03-06",
+    programs: [
+      "Figma",
+      "p5.js",
+      "Three.js",
+      "Shoelace",
+      "3D",
+      "Photoshop",
+    ],
         billede: "/cases/aaben/aaben08.png",
         gif: "/cases/aaben/aaben.gif",
         gifImg: "/cases/aaben/aaben.jpg",
@@ -34,9 +34,11 @@ export const casearray: Case[] = [
         ],
         displayText: "Conceptualization, design and coded solution of a visual design system, which ÅBEN can use to create label designs for their many different beers.",
         imgdisplay: [
-            "/cases/aaben/aaben08.png",
-            "/cases/aaben/aaben06.png",
-            "/cases/aaben/aaben05.png",
+          "/cases/aaben/aaben01.png",
+          "/cases/aaben/aaben02.png",
+          "/cases/aaben/aaben03.png",
+          "/cases/aaben/aaben08.png",
+          "/cases/aaben/aaben04.png",
         ],
     },
     {
@@ -61,8 +63,9 @@ export const casearray: Case[] = [
         imgdisplay: [
             "/cases/shecanplay/shecanplay3.png",
             "/cases/shecanplay/shecanplay4.png",
-            "/cases/shecanplay/shecanplay5.png",
             "/cases/shecanplay/shecanplay9.png",
+            "/cases/shecanplay/shecanplay5.png",
+            
             "/cases/shecanplay/shecanplay7.png",
             "/cases/shecanplay/shecanplay10.png",
         ],
@@ -82,41 +85,17 @@ export const casearray: Case[] = [
         "I have designed a dynamic visual identity for Munich based on the city's flag, which consists of black and yellow diamonds.",
         "The diamond is split into triangles, which serve as the identity's modular building blocks. The triangles can be combined freely and create a dynamic, changeable system."
         ],
-        displayText: "This project presents a dynamic visual identity for Munich inspired by the city's iconic flag with black and yellow diamonds. By dividing the diamond shape into modular triangles, a flexible and adaptable design system is created that can be used across different media and platforms.",
+        displayText: "This project presents a dynamic visual identity for Munich inspired by the city's iconic flag with black and yellow diamonds.",
         imgdisplay: [
-            "/cases/munich/munich07.png",
+            
             "/cases/munich/munich02.png",
             "/cases/munich/munich03.png",
             "/cases/munich/munich04.png",
+            "/cases/munich/munich07.png",
             "/cases/munich/munich05.png",
             "/cases/munich/munich06.png",
         ],
     },
-    {
-    slug: "vikinggame",
-    url: "",
-    titel: "Game Jam: Dont't drink and bike",
-    date: "2026-04-30",
-    programs: [
-      "Unity",
-      "C#",
-    ],
-    billede: "/cases/viking/viking-2.png",
-    gif: "/cases/viking/viking.gif",
-    gifImg: "/cases/viking/viking.jpg",
-    text: [
-      "A simple yet engaging game created for Rådet for Sikker Trafik, designed to raise awareness among young people about the consequences of cycling under the influence.",
-      "The game uses a surreal, adventure-like journey as a metaphor for intoxication, illustrating how being caught up in the moment can distort perception and disconnect players from reality.",
-      "The game was created in four days as a part of a group project.",
-    ],
-    displayText: `A game developed for "Rådet for Sikker Trafik" to raise awareness among young people about the risks of cycling under the influence.`,
-    imgdisplay: [
-      "/cases/viking/viking-2.png",
-      "/cases/viking/viking-5.png",
-      "/cases/viking/viking-6.png",
-    ],
-    
-  },
   {
     slug: "havskaer",
     url: "https://havskaer.netlify.app/",
@@ -136,7 +115,7 @@ export const casearray: Case[] = [
       "In addition, I designed and developed an interactive certification generator that creates unique certificates with each jewelry purchase and communicates the customer’s contribution to ocean preservation through generative patterns based on Perlin noise algorithms.",
 
     ],
-    displayText: `This project presents "Havskær", a conceptual jewelry brand and webshop universe inspired by the ocean, with a strong focus on sustainability and storytelling. The project includes a full visual identity and an interactive certification generator.`,
+    displayText: `This project presents "Havskær", a conceptual jewelry brand inspired by the ocean, with a strong focus on sustainability and storytelling.`,
     imgdisplay: [
       "/cases/havskaer/havskaer-1.png",
       "/cases/havskaer/havskaer-10.png",
@@ -163,11 +142,12 @@ export const casearray: Case[] = [
       "Through three rice paper lamps the installation visualizes changing life situations and relationships surrounding the same product.",
       "By integrating authentic, user-submitted material, the project highlights emotional value, reuse, and longevity, conveying a sustainable narrative of design as something that follows us throughout life."
     ],
-    displayText: "This interactive projection mapping project for IKEA explores how everyday objects become part of people's lives over time. Using three rice paper lamps, the installation visualizes changing life situations and relationships centered around the same product.",
+    displayText: "This interactive projection mapping project for IKEA explores how everyday objects become part of people's lives over time.",
     imgdisplay: [
       "/cases/ikea/ikea-2.gif",
       "/cases/ikea/ikea-1.png",
       "/cases/ikea/ikea-5.png",
+      "/cases/ikea/ikea-3.png",
     ],
   },
 ]

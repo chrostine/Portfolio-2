@@ -5,8 +5,64 @@ type Props = {
 const { images = [] } = Astro.props;
 ---
 
-<div class="grid grid-cols-3">
-    {images.map((src: string) => (
-  <img src={src} alt="" class="w-full h-full object-cover"/>
-))}
+<div id="gallery" class="grid grid-cols-1 sm:grid-cols-6 gap-4">
+  {
+    images.map((src: string) => (
+      <img
+        src={src}
+        alt=""
+        class="w-full h-full object-cover opacity-0 transition-opacity duration-300"
+      />
+    ))
+  }
 </div>
+
+<script>
+  const imgs = Array.from(
+    document.querySelectorAll<HTMLImageElement>("#gallery img"),
+  );
+
+  function classify(ratio: number): "wide" | "square" | "tall" {
+    if (ratio > 1.6) return "wide";
+    if (ratio >= 0.8) return "square";
+    return "tall";
+  }
+
+  function applySpan(img: HTMLImageElement, type: "wide" | "square" | "tall") {
+    const spans = {
+      wide: "sm:col-span-6",
+      square: "sm:col-span-3",
+      tall: "sm:col-span-2",
+    };
+    img.classList.add(spans[type]);
+    img.classList.remove("opacity-0");
+  }
+
+  Promise.all(
+    imgs.map(
+      (img) =>
+        new Promise<void>((resolve) => {
+          if (img.complete) resolve();
+          else img.addEventListener("load", () => resolve());
+        }),
+    ),
+  ).then(() => {
+    // Sortér: brede først, så kvadratiske, så lodrette
+    const sorted = [...imgs].sort((a, b) => {
+      const order = { wide: 0, square: 1, tall: 2 };
+      return (
+        order[classify(a.naturalWidth / a.naturalHeight)] -
+        order[classify(b.naturalWidth / b.naturalHeight)]
+      );
+    });
+
+    // Flyt DOM-elementer til sorteret rækkefølge
+    const gallery = document.getElementById("gallery")!;
+    sorted.forEach((img) => gallery.appendChild(img));
+
+    // Tildel spans
+    sorted.forEach((img) => {
+      applySpan(img, classify(img.naturalWidth / img.naturalHeight));
+    });
+  });
+</script>

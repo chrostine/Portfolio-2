@@ -3,21 +3,22 @@ import Overskrift from "../text/overskrift.astro";
 import Underoverskrift from "../text/underoverskrift.astro";
 import Brodtekst from "../text/brodtekst.astro";
 
-
 let pil = ">";
 
 const { gif, gifimg, href, titel, tekst, programs } = Astro.props;
 ---
 
 <a href={href} class="group">
-  <div class="grid lg:grid-cols-2 grid-cols-1 lg:pb-0 pb-10">
+  <div class="grid lg:grid-cols-2 grid-cols-1 pb-10">
     <!-- billede -->
-    <div class="relative h-full bg-center bg-no-repeat bg-cover">
+    <div
+      class="relative h-full bg-center bg-no-repeat bg-cover border-1 border-sort"
+    >
       <img src={gifimg} data-gif={gif} data-gifimg={gifimg} alt={titel} />
     </div>
 
     <!-- beskrivelse -->
-    <div class="px-10 flex flex-col gap-10 h-full py-5">
+    <div class="px-10 flex flex-col gap-6 h-full py-5">
       <div>
         <Overskrift>
           <h2>{titel}</h2>
