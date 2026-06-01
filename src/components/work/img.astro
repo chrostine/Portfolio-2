@@ -1,0 +1,12 @@
+---
+type Props = {
+  images?: string[];
+};
+const { images = [] } = Astro.props;
+---
+
+<div class="grid grid-cols-3">
+    {images.map((src: string) => (
+  <img src={src} alt="" class="w-full h-full object-cover"/>
+))}
+</div>

@@ -1,0 +1,18 @@
+---
+---
+
+<div class="text-5xl titel font-cycle">
+  <slot />
+</div>
+
+<style>
+  .font-cycle {
+    animation: fontCycle 3s steps(1) infinite;
+  }
+
+  @keyframes fontCycle {
+    0%   { font-family: "RubikBrokenFax", system-ui; }
+    33%  { font-family: "Jacquard12Charted", system-ui; }
+    66%  { font-family: "Jersey10", sans-serif; }
+  }
+</style>

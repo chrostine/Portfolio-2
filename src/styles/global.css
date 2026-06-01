@@ -30,10 +30,37 @@ body {
 }
 
 @font-face {
-    font-family: "BowlbyOne";
+    font-family: "GasoekOne";
     font-weight: 400;
     font-style: normal;
-    src: url("/fonts/BowlbyOne-Regular.ttf");
+    src: url("/fonts/GasoekOne-Regular.ttf");
+}
+
+@font-face {
+    font-family: "RubikBrokenFax";
+    font-weight: 400;
+    font-style: normal;
+    src: url("/fonts/RubikBrokenFax-Regular.ttf");
+}
+
+@font-face {
+    font-family: "Jacquard12Charted";
+    font-weight: 400;
+    font-style: normal;
+    src: url("/fonts/Jacquard12Charted-Regular.ttf");
+}
+
+@font-face {
+    font-family: "Jersey10" ;
+    font-weight: 400;
+    font-style: normal;
+    src: url("/fonts/Jersey10-Regular.ttf");
+}
+@font-face {
+    font-family: "Jersey15" ;
+    font-weight: 400;
+    font-style: normal;
+    src: url("/fonts/Jersey15-Regular.ttf");
 }
 
 /* globale variabler */
@@ -41,9 +68,10 @@ body {
 :root {
   --color-sort: #0c0120;
   --color-hvid: #fffef9;
---color-green: #C3F079;
+  --color-green: #C3F079;
 
-  --font-titel: "BowlbyOne", sans-serif;
+  --font-overskrift: "GasoekOne", sans-serif;
+  --font-overskrift2: "Jersey15", sans-serif;
   --font-underoverskrift: "ChivoMono", monospace;
   --font-brodtekst: "GolosText", sans-serif;
 }
@@ -55,18 +83,19 @@ body {
   --color-green: var(--color-green);
 
   /* fonte */
-  --font-titel: "BowlbyOne", sans-serif;
+  --font-overskrift: "GasoekOne", sans-serif;
+  --font-overskrift: "Jersey15", sans-serif;
   --font-underoverskrift: "ChivoMono", monospace;
   --font-brodtekst: "GolosText", sans-serif;
 }
 
 @layer base {
     h1 {
-        @apply uppercase;
-        font-family: var(--font-titel);
+        font-family: var(--font-overskrift);
     }
     h2 {
-        font-family: var(--font-titel);
+        @apply uppercase;
+        font-family: var(--font-overskrift2);
     }
     h3 {
         @apply lowercase;
