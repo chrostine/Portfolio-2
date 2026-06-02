@@ -11,10 +11,14 @@ const { gif, gifimg, href, titel, tekst, programs } = Astro.props;
 <a href={href} class="group">
   <div class="grid lg:grid-cols-2 grid-cols-1 pb-10">
     <!-- billede -->
-    <div
-      class="relative h-full bg-center bg-no-repeat bg-cover border-1 border-sort"
-    >
-      <img src={gifimg} data-gif={gif} data-gifimg={gifimg} alt={titel} />
+    <div class="relative h-full bg-center bg-no-repeat bg-cover">
+      <img
+        src={gifimg}
+        data-gif={gif}
+        data-gifimg={gifimg}
+        alt={titel}
+        transition:name={`case-img-${titel}`}
+      />
     </div>
 
     <!-- beskrivelse -->
@@ -39,17 +43,23 @@ const { gif, gifimg, href, titel, tekst, programs } = Astro.props;
   </div>
 </a>
 
+<!-- afspiller gif ved hover -->
 <script is:inline>
-  document.querySelectorAll("a.group").forEach((link) => {
-    const img = link.querySelector("img[data-gif]");
-    if (!img) return;
+  function initGifs() {
+    document.querySelectorAll("a.group").forEach((link) => {
+      const img = link.querySelector("img[data-gif]");
+      if (!img) return;
 
-    link.addEventListener("mouseenter", () => {
-      img.src = img.dataset.gif;
-    });
+      link.addEventListener("mouseenter", () => {
+        img.src = img.dataset.gif;
+      });
 
-    link.addEventListener("mouseleave", () => {
-      img.src = img.dataset.gifimg;
+      link.addEventListener("mouseleave", () => {
+        img.src = img.dataset.gifimg;
+      });
     });
-  });
+  }
+
+  initGifs();
+  document.addEventListener("astro:page-load", initGifs);
 </script>

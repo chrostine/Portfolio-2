@@ -18,51 +18,59 @@ const { images = [] } = Astro.props;
 </div>
 
 <script>
-  const imgs = Array.from(
-    document.querySelectorAll<HTMLImageElement>("#gallery img"),
-  );
+  function initGallery() {
+    const imgs = Array.from(
+      document.querySelectorAll<HTMLImageElement>("#gallery img"),
+    );
 
-  function classify(ratio: number): "wide" | "square" | "tall" {
-    if (ratio > 1.6) return "wide";
-    if (ratio >= 0.8) return "square";
-    return "tall";
+    if (imgs.length === 0) return;
+
+    function classify(ratio: number): "wide" | "square" | "tall" {
+      if (ratio > 1.6) return "wide";
+      if (ratio >= 0.8) return "square";
+      return "tall";
+    }
+
+    function applySpan(
+      img: HTMLImageElement,
+      type: "wide" | "square" | "tall",
+    ) {
+      const spans = {
+        wide: "sm:col-span-6",
+        square: "sm:col-span-3",
+        tall: "sm:col-span-2",
+      };
+      img.classList.add(spans[type]);
+      img.classList.remove("opacity-0");
+    }
+
+    Promise.all(
+      imgs.map(
+        (img) =>
+          new Promise<void>((resolve) => {
+            if (img.complete) resolve();
+            else img.addEventListener("load", () => resolve());
+          }),
+      ),
+    ).then(() => {
+      const sorted = [...imgs].sort((a, b) => {
+        const order = { wide: 0, square: 1, tall: 2 };
+        return (
+          order[classify(a.naturalWidth / a.naturalHeight)] -
+          order[classify(b.naturalWidth / b.naturalHeight)]
+        );
+      });
+
+      const gallery = document.getElementById("gallery")!;
+      sorted.forEach((img) => gallery.appendChild(img));
+
+      sorted.forEach((img) => {
+        applySpan(img, classify(img.naturalWidth / img.naturalHeight));
+      });
+    });
   }
 
-  function applySpan(img: HTMLImageElement, type: "wide" | "square" | "tall") {
-    const spans = {
-      wide: "sm:col-span-6",
-      square: "sm:col-span-3",
-      tall: "sm:col-span-2",
-    };
-    img.classList.add(spans[type]);
-    img.classList.remove("opacity-0");
-  }
+  initGallery();
 
-  Promise.all(
-    imgs.map(
-      (img) =>
-        new Promise<void>((resolve) => {
-          if (img.complete) resolve();
-          else img.addEventListener("load", () => resolve());
-        }),
-    ),
-  ).then(() => {
-    // Sortér: brede først, så kvadratiske, så lodrette
-    const sorted = [...imgs].sort((a, b) => {
-      const order = { wide: 0, square: 1, tall: 2 };
-      return (
-        order[classify(a.naturalWidth / a.naturalHeight)] -
-        order[classify(b.naturalWidth / b.naturalHeight)]
-      );
-    });
-
-    // Flyt DOM-elementer til sorteret rækkefølge
-    const gallery = document.getElementById("gallery")!;
-    sorted.forEach((img) => gallery.appendChild(img));
-
-    // Tildel spans
-    sorted.forEach((img) => {
-      applySpan(img, classify(img.naturalWidth / img.naturalHeight));
-    });
-  });
+  document.addEventListener("astro:page-load", initGallery);
 </script>
