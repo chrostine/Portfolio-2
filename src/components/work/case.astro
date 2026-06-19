@@ -5,20 +5,21 @@ import Brodtekst from "../text/brodtekst.astro";
 
 let pil = ">";
 
-const { gif, gifimg, href, titel, tekst, programs } = Astro.props;
+const { video, href, titel, tekst, programs } = Astro.props;
 ---
 
 <a href={href} class="group">
   <div class="grid lg:grid-cols-2 grid-cols-1 pb-10">
-    <!-- billede -->
+    <!-- video -->
     <div class="relative h-full bg-center bg-no-repeat bg-cover">
-      <img
-        src={gifimg}
-        data-gif={gif}
-        data-gifimg={gifimg}
-        alt={titel}
-        transition:name={`case-img-${titel}`}
-      />
+      <video
+        src={video}
+        muted
+        loop
+        playsinline
+        preload="auto"
+        class="w-full h-full object-cover"
+        transition:name={`case-img-${titel}`}></video>
     </div>
 
     <!-- beskrivelse -->
@@ -43,23 +44,25 @@ const { gif, gifimg, href, titel, tekst, programs } = Astro.props;
   </div>
 </a>
 
-<!-- afspiller gif ved hover -->
+<!-- afspiller video ved hover -->
 <script is:inline>
-  function initGifs() {
+  function initVideos() {
     document.querySelectorAll("a.group").forEach((link) => {
-      const img = link.querySelector("img[data-gif]");
-      if (!img) return;
+      const video = link.querySelector("video");
+      if (!video) return;
 
       link.addEventListener("mouseenter", () => {
-        img.src = img.dataset.gif;
+        const p = video.play();
+        if (p) p.catch(() => {});
       });
 
       link.addEventListener("mouseleave", () => {
-        img.src = img.dataset.gifimg;
+        video.pause();
+        video.currentTime = 0;
       });
     });
   }
 
-  initGifs();
-  document.addEventListener("astro:page-load", initGifs);
+  initVideos();
+  document.addEventListener("astro:page-load", initVideos);
 </script>

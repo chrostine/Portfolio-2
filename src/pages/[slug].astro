@@ -20,7 +20,7 @@ export async function getStaticPaths() {
 }
 
 const { caseData } = Astro.props;
-const { titel, gif, text, imgdisplay, date, programs, url } = caseData;
+const { titel, video, text, imgdisplay, date, programs, url } = caseData;
 ---
 
 <Layout>
@@ -28,12 +28,14 @@ const { titel, gif, text, imgdisplay, date, programs, url } = caseData;
     <Nav />
     <div class="mx-auto max-w-7xl grid gap-25 pb-25 globalpy-15">
       <div class="grid gap-5 place-items-center">
-        <img
-          src={gif}
-          alt={titel}
+        <video
+          src={video}
           id="case-hero-img"
-          transition:name={`case-img-${caseData.titel}`}
-        />
+          autoplay
+          muted
+          loop
+          playsinline
+          transition:name={`case-img-${caseData.titel}`}></video>
         {url && <Knap url={url} tekst="try it yourself" />}
       </div>
       <!-- tekst indhold -->
