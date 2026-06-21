@@ -2,7 +2,6 @@ export type Case = {
   slug: string;
   titel: string;
   date: string;
-  billede: string;
   video: string;
   text: string[];
   displayText: string;
@@ -25,7 +24,6 @@ export const casearray: Case[] = [
       "3D",
       "Photoshop",
     ],
-    billede: "/cases/aaben/aaben08.png",
     video: "/cases/aaben/aaben.mp4",
     text: [
       "Conceptualization, design and coded solution of a visual design system, which ÅBEN can use to create label designs for their many different beers.",
@@ -42,28 +40,26 @@ export const casearray: Case[] = [
   {
     slug: "space",
     url: "https://hovedrum.netlify.app/",
-    titel: `Label generator for "Åben øl"`,
+    titel: "Space - take your thoughts out",
     date: "2026-06-19",
     programs: [
-      "Figma",
-      "p5.js",
-      "Three.js",
-      "Shoelace",
-      "3D",
-      "Photoshop",
+      "Astro",
+      "Generative AI",
+      "Tailwind"
     ],
-    billede: "/cases/aaben/aaben08.png",
     video: "/cases/space/space.mp4",
     text: [
-      "Conceptualization, design and coded solution of a visual design system, which ÅBEN can use to create label designs for their many different beers.",
+      `Space is a concept for a digital tool that helps young people process their thoughts and feelings by combining an AI conversation with the principle behind "walk and talk" therapy, which takes place while going for a walk in nature.`,
+      "The tool is made for Headspace. Headspace is a free and anonymous counselling service for young people aged 12 to 25, where volunteer counsellors listen without judgement and take their starting point in the young person's own needs.",
+      `The user is met by a chat interface designed to lower the threshold by meeting young people in a format they already know. The messages disappear along the way, so it feels safe to open up and reflect honestly. The AI guides the conversation rather than "treating" it, and the entire experience is designed with ethical and psychological considerations in mind.`,
+      "The aim is to leave the user with greater clarity, to make them feel better equipped to handle their life, and to create a habit of movement in nature while giving the user a bodily experience that it works.",
+      "The visual elements in the product were created using a generative text-to-video AI (Creative Fabrica's AI Video Generator), where I used prompts to train the model to deliver the desired output."
     ],
-    displayText: "Conceptualization, design and coded solution of a visual design system, which ÅBEN can use to create label designs for their many different beers.",
+    displayText: `Space is a concept for a digital tool that helps young people process their thoughts and feelings by combining an AI conversation with the principle behind "walk and talk" therapy, which takes place while going for a walk in nature.`,
     imgdisplay: [
-      "/cases/aaben/aaben01.png",
-      "/cases/aaben/aaben02.png",
-      "/cases/aaben/aaben03.png",
-      "/cases/aaben/aaben08.png",
-      "/cases/aaben/aaben04.png",
+      "/cases/space/space-1.png",
+      "/cases/space/space-2.png",
+      "/cases/space/space.gif",
     ],
   },
   {
@@ -75,7 +71,6 @@ export const casearray: Case[] = [
       "Figma",
       "p5.js",
     ],
-    billede: "/cases/shecanplay/shecanplay9.png",
     video: "/cases/shecanplay/blob.mp4",
     text: [
       "Koncept: formlessness.",
@@ -101,7 +96,6 @@ export const casearray: Case[] = [
     programs: [
       "Figma",
     ],
-    billede: "/cases/munich/munich07.png",
     video: "/cases/munich/munich.mp4",
     text: [
       "I have designed a dynamic visual identity for Munich based on the city's flag, which consists of black and yellow diamonds.",
@@ -126,7 +120,6 @@ export const casearray: Case[] = [
       "Illustrator",
       "p5.js",
     ],
-    billede: "/cases/havskaer/havskaer-10.png",
     video: "/cases/havskaer/havskaer.mp4",
     text: [
       "Havskær is a conceptual jewelry brand and webshop universe inspired by the ocean, created with a focus on sustainability and storytelling.",
@@ -153,7 +146,6 @@ export const casearray: Case[] = [
       "TouchDesigner",
       "MadMapper",
     ],
-    billede: "/cases/ikea/ikea-1.png",
     video: "/cases/ikea/ikea1.mp4",
     text: [
       `An interactive projection mapping project created for IKEA, exploring how everyday objects become part of people's lives over time.`,
