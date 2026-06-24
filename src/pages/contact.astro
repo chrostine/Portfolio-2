@@ -1,0 +1,51 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Nav from "../components/UI/nav.astro";
+
+import Some from "../components/UI/some.astro";
+import Titel from "../components/text/titel.astro";
+
+import LinkedIn from "../assets/linkedin.svg";
+import GitHub from "../assets/github.svg";
+import Instagram from "../assets/instagram.svg";
+---
+
+<Layout>
+  <Nav />
+
+  <div class="mx-auto max-w-7xl grid gap-25 pb-25 globalpy-15">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-15 px-5 pt-25">
+      <div class="flex md:justify-end justify-center">
+        <img
+          src="some/christine.png"
+          alt="christine smiler"
+          class="h-[400px] w-auto object-cover"
+        />
+      </div>
+      <div class="flex md:justify-start justify-center py-10">
+        <div class="flex items-center flex-col text-sm">
+          <div class="pb-5"><Titel>contact</Titel></div>
+
+          <p>Christine Wrang Swierkosz</p>
+          <p>christineswierkosz@outlook.dk</p>
+          <p>2094 0242</p>
+
+          <Some class="text-sort">
+            <a
+              href="https://dk.linkedin.com/in/christine-swierkosz-38359a289"
+              target="_blank"
+            >
+              <LinkedIn class="h-9 w-auto" fill="currentColor" />
+            </a>
+            <a href="https://github.com/chrostine" target="_blank">
+              <GitHub class="h-9 w-auto" fill="currentColor" />
+            </a>
+            <a href="https://www.instagram.com/wrangstrik/" target="_blank">
+              <Instagram class="h-9 w-auto" fill="currentColor" />
+            </a>
+          </Some>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
