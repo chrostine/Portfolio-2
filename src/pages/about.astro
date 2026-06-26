@@ -19,12 +19,17 @@ import Footer from "../components/UI/footer.astro";
       <!-- indsæt visuelt indhold -->
       <img src="some/moodboard.png" />
       <div class="grid grid-cols-1 md:grid-cols-2 gap-15">
-        <div>
-          <Overskrift><h2>About</h2></Overskrift>
-          <Underoverskrift>
-            <h3>hello, my name is Christine</h3>
-            <h3>I am a Coded Designer</h3>
-          </Underoverskrift>
+        <div class="grid gap-15">
+          <div>
+            <Overskrift><h2>About</h2></Overskrift>
+            <Underoverskrift>
+              <h3>hello, my name is Christine</h3>
+              <h3>I am a Coded Designer</h3>
+            </Underoverskrift>
+          </div>
+          <div class="flex justify-center">
+            <img src="some/figur.svg" />
+          </div>
         </div>
         <div class="md:px-0 px-10">
           <Brodtekst>
@@ -50,9 +55,7 @@ import Footer from "../components/UI/footer.astro";
           </Brodtekst>
         </div>
       </div>
-      <div class="flex justify-center">
-        <img src="some/figur.svg" />
-      </div>
+      
     </div>
     <Footer />
   </div>
