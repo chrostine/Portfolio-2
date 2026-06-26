@@ -21,7 +21,6 @@ export const casearray: Case[] = [
       "p5.js",
       "Three.js",
       "Shoelace",
-      "3D",
       "Photoshop",
     ],
     video: "/cases/aaben/aaben.mp4",
