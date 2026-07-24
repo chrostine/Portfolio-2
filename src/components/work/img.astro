@@ -4,19 +4,31 @@ interface Props {
   title?: string;
 }
 
-const { images = [], title = "Project" } = Astro.props;
+const {
+  images = [],
+  title = "Project",
+} = Astro.props;
 ---
 
-<div data-gallery class="grid grid-cols-1 sm:grid-cols-6 gap-4">
+<div
+  data-gallery
+  class="grid grid-cols-1 gap-4 sm:grid-cols-6"
+>
   {
     images.map((src, index) => (
-      <img
-        src={src}
-        alt={`${title} project image ${index + 1}`}
-        loading="lazy"
-        decoding="async"
-        class="w-full h-full object-cover opacity-0 transition-opacity duration-300"
-      />
+      <figure
+        data-gallery-item
+        data-original-index={index}
+        class="col-span-1 m-0 min-w-0 sm:col-span-6"
+      >
+        <img
+          src={src}
+          alt={`${title} project image ${index + 1}`}
+          loading={index < 2 ? "eager" : "lazy"}
+          decoding="async"
+          class="block w-full max-w-full h-auto opacity-0 transition-opacity duration-300"
+        />
+      </figure>
     ))
   }
 </div>
@@ -24,57 +36,247 @@ const { images = [], title = "Project" } = Astro.props;
 <script>
   type ImageShape = "wide" | "square" | "tall";
 
-  function initGalleries(): void {
-    document.querySelectorAll<HTMLElement>("[data-gallery]").forEach((gallery) => {
-      if (gallery.dataset.initialized === "true") return;
-      gallery.dataset.initialized = "true";
+  interface GalleryItem {
+    wrapper: HTMLElement;
+    image: HTMLImageElement;
+    shape: ImageShape;
+    originalIndex: number;
+  }
 
-      const images = Array.from(gallery.querySelectorAll<HTMLImageElement>("img"));
-      if (images.length === 0) return;
+  const initializedGalleries = new WeakSet<HTMLElement>();
+  const initializedImages = new WeakSet<HTMLImageElement>();
 
-      const classify = (ratio: number): ImageShape => {
-        if (!Number.isFinite(ratio) || ratio <= 0) return "square";
-        if (ratio > 1.6) return "wide";
-        if (ratio >= 0.8) return "square";
-        return "tall";
+  function classifyImage(
+    image: HTMLImageElement,
+  ): ImageShape {
+    const { naturalWidth, naturalHeight } = image;
+
+    if (
+      naturalWidth <= 0 ||
+      naturalHeight <= 0
+    ) {
+      return "square";
+    }
+
+    const ratio = naturalWidth / naturalHeight;
+
+    if (!Number.isFinite(ratio) || ratio <= 0) {
+      return "square";
+    }
+
+    if (ratio > 1.6) {
+      return "wide";
+    }
+
+    if (ratio >= 0.8) {
+      return "square";
+    }
+
+    return "tall";
+  }
+
+  function applyGridSpan(
+    wrapper: HTMLElement,
+    shape: ImageShape,
+  ): void {
+    wrapper.classList.remove(
+      "sm:col-span-2",
+      "sm:col-span-3",
+      "sm:col-span-6",
+    );
+
+    switch (shape) {
+      case "wide":
+        wrapper.classList.add("sm:col-span-6");
+        break;
+
+      case "square":
+        wrapper.classList.add("sm:col-span-3");
+        break;
+
+      case "tall":
+        wrapper.classList.add("sm:col-span-2");
+        break;
+    }
+  }
+
+  function revealImage(
+    image: HTMLImageElement,
+  ): void {
+    /*
+     * requestAnimationFrame giver Safari mulighed for først
+     * at beregne billedets naturlige størrelse og grid-layout.
+     */
+    requestAnimationFrame(() => {
+      if (!image.isConnected) return;
+
+      image.classList.remove("opacity-0");
+    });
+  }
+
+  function waitForImage(
+    image: HTMLImageElement,
+  ): Promise<boolean> {
+    return new Promise((resolve) => {
+      /*
+       * Safari kan sætte complete=true både for indlæste
+       * og fejlede billeder. naturalWidth afgør resultatet.
+       */
+      if (image.complete) {
+        resolve(image.naturalWidth > 0);
+        return;
+      }
+
+      const handleLoad = (): void => {
+        cleanup();
+        resolve(image.naturalWidth > 0);
       };
 
-      const spans: Record<ImageShape, string> = {
-        wide: "sm:col-span-6",
-        square: "sm:col-span-3",
-        tall: "sm:col-span-2",
+      const handleError = (): void => {
+        cleanup();
+        resolve(false);
       };
 
-      Promise.all(
-        images.map(
-          (image) =>
-            new Promise<void>((resolve) => {
-              if (image.complete) return resolve();
-              image.addEventListener("load", () => resolve(), { once: true });
-              image.addEventListener("error", () => resolve(), { once: true });
-            }),
-        ),
-      ).then(() => {
-        const order: Record<ImageShape, number> = { wide: 0, square: 1, tall: 2 };
-        const sorted = [...images].sort((a, b) => {
-          const aShape = classify(a.naturalWidth / a.naturalHeight);
-          const bShape = classify(b.naturalWidth / b.naturalHeight);
-          return order[aShape] - order[bShape];
-        });
+      const cleanup = (): void => {
+        image.removeEventListener("load", handleLoad);
+        image.removeEventListener("error", handleError);
+      };
 
-        for (const image of sorted) {
-          gallery.appendChild(image);
-          if (image.naturalWidth === 0) {
-            image.remove();
-            continue;
-          }
-          image.classList.add(spans[classify(image.naturalWidth / image.naturalHeight)]);
-          image.classList.remove("opacity-0");
-        }
+      image.addEventListener("load", handleLoad, {
+        once: true,
+      });
+
+      image.addEventListener("error", handleError, {
+        once: true,
       });
     });
   }
 
+  async function initializeGallery(
+    gallery: HTMLElement,
+  ): Promise<void> {
+    if (initializedGalleries.has(gallery)) return;
+
+    initializedGalleries.add(gallery);
+
+    const wrappers = Array.from(
+      gallery.querySelectorAll<HTMLElement>(
+        "[data-gallery-item]",
+      ),
+    );
+
+    if (wrappers.length === 0) return;
+
+    const items = await Promise.all(
+      wrappers.map(async (wrapper) => {
+        const image =
+          wrapper.querySelector<HTMLImageElement>("img");
+
+        if (!image) {
+          wrapper.remove();
+          return null;
+        }
+
+        const loaded = await waitForImage(image);
+
+        /*
+         * Kontroller igen efter await, fordi ClientRouter kan
+         * have fjernet siden, mens billedet blev indlæst.
+         */
+        if (
+          !gallery.isConnected ||
+          !wrapper.isConnected ||
+          !image.isConnected
+        ) {
+          return null;
+        }
+
+        if (!loaded) {
+          wrapper.remove();
+          return null;
+        }
+
+        const shape = classifyImage(image);
+
+        applyGridSpan(wrapper, shape);
+        revealImage(image);
+
+        initializedImages.add(image);
+
+        const originalIndex = Number.parseInt(
+          wrapper.dataset.originalIndex ?? "0",
+          10,
+        );
+
+        return {
+          wrapper,
+          image,
+          shape,
+          originalIndex: Number.isFinite(originalIndex)
+            ? originalIndex
+            : 0,
+        } satisfies GalleryItem;
+      }),
+    );
+
+    if (!gallery.isConnected) return;
+
+    const validItems = items.filter(
+      (item): item is GalleryItem => item !== null,
+    );
+
+    const shapeOrder: Record<ImageShape, number> = {
+      wide: 0,
+      square: 1,
+      tall: 2,
+    };
+
+    validItems.sort((a, b) => {
+      const shapeDifference =
+        shapeOrder[a.shape] - shapeOrder[b.shape];
+
+      /*
+       * Bevar den oprindelige rækkefølge blandt billeder
+       * med samme form.
+       */
+      if (shapeDifference !== 0) {
+        return shapeDifference;
+      }
+
+      return a.originalIndex - b.originalIndex;
+    });
+
+    /*
+     * Flyt wrapper-elementerne, ikke billederne.
+     * Det giver et mere stabilt CSS Grid-layout i Safari.
+     */
+    const fragment = document.createDocumentFragment();
+
+    for (const item of validItems) {
+      fragment.appendChild(item.wrapper);
+    }
+
+    gallery.appendChild(fragment);
+  }
+
+  function initGalleries(): void {
+    document
+      .querySelectorAll<HTMLElement>("[data-gallery]")
+      .forEach((gallery) => {
+        void initializeGallery(gallery);
+      });
+  }
+
+  /*
+   * Første almindelige sideindlæsning.
+   */
   initGalleries();
-  document.addEventListener("astro:page-load", initGalleries);
+
+  /*
+   * Efter navigation med Astro ClientRouter.
+   */
+  document.addEventListener(
+    "astro:page-load",
+    initGalleries,
+  );
 </script>
