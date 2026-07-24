@@ -1,9 +1,74 @@
 ---
 import Underoverskrift from "./text/underoverskrift.astro";
 ---
+
 <div class="grid gap-5">
-    <h1 class="text-6xl">christine's portfolio</h1>
-    <Underoverskrift>
-        <h3>I am a coded designer, and I work with digital experiences where technology and creativity merge.</h3>
-    </Underoverskrift>
+  <h1 class="text-6xl">christine wrang swierkosz</h1>
+
+  <Underoverskrift>
+    <h3 id="typewriter" class="min-h-[2lh]">&nbsp;</h3>
+  </Underoverskrift>
 </div>
+
+<script>
+const words = [
+  "Welcome to my portfolio",
+  "I am a coded designer",
+  "I work with digital experiences where technology and creativity merge"
+];
+
+let timeoutId;
+
+function startTypewriter() {
+  const el = document.getElementById("typewriter");
+
+  if (!el) return;
+
+  let i = 0;
+  let j = 0;
+  let isDeleting = false;
+
+  function type() {
+    // Stop hvis elementet er blevet fjernet af ClientRouter
+    if (!document.body.contains(el)) return;
+
+    const currentWord = words[i];
+
+    if (isDeleting) {
+      j--;
+
+      const text = currentWord.substring(0, j);
+      el.textContent = text || "\u00A0";
+
+      if (j === 0) {
+        isDeleting = false;
+        i = (i + 1) % words.length;
+      }
+
+      timeoutId = window.setTimeout(type, 70);
+    } else {
+      j++;
+
+      el.textContent = currentWord.substring(0, j);
+
+      if (j === currentWord.length) {
+        isDeleting = true;
+        timeoutId = window.setTimeout(type, 2000);
+      } else {
+        timeoutId = window.setTimeout(type, 70);
+      }
+    }
+  }
+
+  type();
+}
+
+document.addEventListener("astro:page-load", () => {
+  clearTimeout(timeoutId);
+  startTypewriter();
+});
+
+document.addEventListener("astro:before-swap", () => {
+  clearTimeout(timeoutId);
+});
+</script>

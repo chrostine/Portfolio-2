@@ -1,15 +1,14 @@
 ---
+// case.astro
 import Overskrift from "../text/overskrift.astro";
 import Underoverskrift from "../text/underoverskrift.astro";
 import Brodtekst from "../text/brodtekst.astro";
 
-let pil = ">";
-
-const { video, href, titel, tekst, programs } = Astro.props;
+const { video, href, titel, tekst, programs = [] } = Astro.props;
 ---
 
-<a href={href} class="group">
-  <div class="grid lg:grid-cols-2 grid-cols-1 pb-10">
+<a href={href} class="group md:w-xl w-full shrink-0 bg-hvid text-sort">
+  <div class="grid grid-cols-1">
     <!-- video -->
     <div class="relative h-full bg-center bg-no-repeat bg-cover">
       <video
@@ -31,15 +30,6 @@ const { video, href, titel, tekst, programs } = Astro.props;
         <Underoverskrift><h3>{programs.join(", ")}</h3></Underoverskrift>
       </div>
       <Brodtekst><p>{tekst}</p></Brodtekst>
-      <div class="mt-auto flex justify-end">
-        <Overskrift>
-          <h3
-            class="transition-transform duration-200 group-hover:translate-x-2"
-          >
-            {pil}
-          </h3>
-        </Overskrift>
-      </div>
     </div>
   </div>
 </a>
@@ -49,7 +39,11 @@ const { video, href, titel, tekst, programs } = Astro.props;
   function initVideos() {
     document.querySelectorAll("a.group").forEach((link) => {
       const video = link.querySelector("video");
-      if (!video) return;
+      if (!video || video.dataset.initialized) return;
+      video.dataset.initialized = "true";
+
+      // Tving browseren til at loade videoen efter view transition
+      video.load();
 
       link.addEventListener("mouseenter", () => {
         const p = video.play();

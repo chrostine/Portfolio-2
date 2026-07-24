@@ -1,4 +1,5 @@
 ---
+// slug.astro
 import Layout from "../layouts/Layout.astro";
 import Nav from "../components/UI/nav.astro";
 import Footer from "../components/UI/footer.astro";
@@ -13,14 +14,30 @@ import Brodtekst from "../components/text/brodtekst.astro";
 import { casearray } from "../scripts/casearray";
 
 export async function getStaticPaths() {
-  return casearray.map((c) => ({
-    params: { slug: c.slug },
-    props: { caseData: c },
-  }));
+  return casearray
+    .filter((c) => {
+      if (!c.slug) {
+        console.warn("Case uden slug er sprunget over:", c.titel ?? c);
+        return false;
+      }
+      return true;
+    })
+    .map((c) => ({
+      params: { slug: c.slug },
+      props: { caseData: c },
+    }));
 }
 
 const { caseData } = Astro.props;
-const { titel, video, text, imgdisplay, date, programs, url } = caseData;
+const {
+  titel,
+  video,
+  text = [],
+  imgdisplay = [],
+  date,
+  programs = [],
+  url,
+} = caseData;
 ---
 
 <Layout>
@@ -35,7 +52,7 @@ const { titel, video, text, imgdisplay, date, programs, url } = caseData;
           muted
           loop
           playsinline
-          transition:name={`case-img-${caseData.titel}`}></video>
+          transition:name={`case-img-${titel}`}></video>
         {url && <Knap url={url} tekst="try it yourself" />}
       </div>
       <!-- tekst indhold -->
@@ -58,15 +75,17 @@ const { titel, video, text, imgdisplay, date, programs, url } = caseData;
 </Layout>
 
 <script>
-  document.addEventListener("astro:before-preparation", (e) => {
-    const img = document.getElementById("case-hero-img");
-    if (!img) return;
+  function initHeroVideo() {
+    const video = document.getElementById("case-hero-img") as HTMLVideoElement | null;
+    if (!video) return;
+    if (video.dataset.initialized) return;
+    video.dataset.initialized = "true";
 
-    const rect = img.getBoundingClientRect();
-    const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+    video.load();
+    const p = video.play();
+    if (p) p.catch(() => {});
+  }
 
-    if (!isVisible) {
-      img.removeAttribute("data-astro-transition-scope");
-    }
-  });
+  initHeroVideo();
+  document.addEventListener("astro:page-load", initHeroVideo);
 </script>

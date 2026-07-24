@@ -1,4 +1,5 @@
 ---
+// img.astro
 type Props = {
   images?: string[];
 };
@@ -19,13 +20,18 @@ const { images = [] } = Astro.props;
 
 <script>
   function initGallery() {
+    const gallery = document.getElementById("gallery");
+    if (!gallery) return;
+
     const imgs = Array.from(
-      document.querySelectorAll<HTMLImageElement>("#gallery img"),
+      gallery.querySelectorAll<HTMLImageElement>("img"),
     );
 
-    if (imgs.length === 0) return;
+    if (imgs.length === 0 || gallery.dataset.initialized) return;
+    gallery.dataset.initialized = "true";
 
     function classify(ratio: number): "wide" | "square" | "tall" {
+      if (!Number.isFinite(ratio) || ratio <= 0) return "square";
       if (ratio > 1.6) return "wide";
       if (ratio >= 0.8) return "square";
       return "tall";
@@ -48,8 +54,12 @@ const { images = [] } = Astro.props;
       imgs.map(
         (img) =>
           new Promise<void>((resolve) => {
-            if (img.complete) resolve();
-            else img.addEventListener("load", () => resolve());
+            if (img.complete && img.naturalWidth > 0) {
+              resolve();
+            } else {
+              img.addEventListener("load", () => resolve(), { once: true });
+              img.addEventListener("error", () => resolve(), { once: true });
+            }
           }),
       ),
     ).then(() => {
@@ -61,10 +71,10 @@ const { images = [] } = Astro.props;
         );
       });
 
-      const gallery = document.getElementById("gallery")!;
       sorted.forEach((img) => gallery.appendChild(img));
 
       sorted.forEach((img) => {
+        if (img.naturalWidth === 0) return; // billedet fejlede - lad det være skjult
         applySpan(img, classify(img.naturalWidth / img.naturalHeight));
       });
     });
