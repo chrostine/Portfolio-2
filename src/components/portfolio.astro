@@ -1,74 +1,131 @@
 ---
 import Underoverskrift from "./text/underoverskrift.astro";
----
 
-<div class="grid gap-5">
-  <h1 class="text-6xl">christine wrang swierkosz</h1>
-
-  <Underoverskrift>
-    <h3 id="typewriter" class="min-h-[2lh]">&nbsp;</h3>
-  </Underoverskrift>
-</div>
-
-<script>
-const words = [
+const typewriterMessages = [
   "Welcome to my portfolio",
   "I am a coded designer",
-  "I work with digital experiences where technology and creativity merge"
-];
+  "I work with digital experiences where technology and creativity merge",
+] as const;
 
-let timeoutId;
+const accessibleDescription = typewriterMessages.join(". ");
+---
 
-function startTypewriter() {
-  const el = document.getElementById("typewriter");
+<header class="grid gap-5">
+  <h1 class="sm:text-6xl text-5xl">christine wrang swierkosz</h1>
 
-  if (!el) return;
+  <Underoverskrift>
+    <h3 class="min-h-[2lh]">
+      <span
+        data-typewriter
+        data-messages={JSON.stringify(typewriterMessages)}
+        aria-hidden="true"
+      >
+        {typewriterMessages[0]}
+      </span>
+      <span class="sr-only">{accessibleDescription}</span>
+    </h3>
+  </Underoverskrift>
+</header>
 
-  let i = 0;
-  let j = 0;
-  let isDeleting = false;
+<script>
+  const TYPE_DELAY_MS = 70;
+  const MESSAGE_PAUSE_MS = 2_000;
+  const EMPTY_TEXT = "\u00A0";
+  const activeTimers = new Map<HTMLElement, number>();
 
-  function type() {
-    // Stop hvis elementet er blevet fjernet af ClientRouter
-    if (!document.body.contains(el)) return;
+  function clearTimer(element: HTMLElement): void {
+    const timerId = activeTimers.get(element);
 
-    const currentWord = words[i];
-
-    if (isDeleting) {
-      j--;
-
-      const text = currentWord.substring(0, j);
-      el.textContent = text || "\u00A0";
-
-      if (j === 0) {
-        isDeleting = false;
-        i = (i + 1) % words.length;
-      }
-
-      timeoutId = window.setTimeout(type, 70);
-    } else {
-      j++;
-
-      el.textContent = currentWord.substring(0, j);
-
-      if (j === currentWord.length) {
-        isDeleting = true;
-        timeoutId = window.setTimeout(type, 2000);
-      } else {
-        timeoutId = window.setTimeout(type, 70);
-      }
+    if (timerId !== undefined) {
+      window.clearTimeout(timerId);
+      activeTimers.delete(element);
     }
   }
 
-  type();
-}
+  function readMessages(element: HTMLElement): string[] {
+    const rawMessages = element.dataset.messages;
+    if (!rawMessages) return [];
 
-document.addEventListener("astro:page-load", () => {
-  clearTimeout(timeoutId);
-  startTypewriter();
-});
+    try {
+      const parsed: unknown = JSON.parse(rawMessages);
 
-document.addEventListener("astro:before-swap", () => {
-  clearTimeout(timeoutId);
-});
+      return Array.isArray(parsed)
+        ? parsed.filter(
+            (message): message is string =>
+              typeof message === "string" && message.trim().length > 0,
+          )
+        : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function initialiseTypewriter(element: HTMLElement): void {
+    clearTimer(element);
+
+    const messages = readMessages(element);
+    if (messages.length === 0) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      element.textContent = messages[0];
+      return;
+    }
+
+    let messageIndex = 0;
+    let characterIndex = 0;
+    let deleting = false;
+
+    const schedule = (delay: number): void => {
+      clearTimer(element);
+      activeTimers.set(element, window.setTimeout(update, delay));
+    };
+
+    const update = (): void => {
+      if (!element.isConnected) {
+        clearTimer(element);
+        return;
+      }
+
+      const currentMessage = messages[messageIndex];
+      characterIndex += deleting ? -1 : 1;
+      characterIndex = Math.min(
+        Math.max(characterIndex, 0),
+        currentMessage.length,
+      );
+
+      element.textContent =
+        currentMessage.slice(0, characterIndex) || EMPTY_TEXT;
+
+      if (!deleting && characterIndex === currentMessage.length) {
+        deleting = true;
+        schedule(MESSAGE_PAUSE_MS);
+        return;
+      }
+
+      if (deleting && characterIndex === 0) {
+        deleting = false;
+        messageIndex = (messageIndex + 1) % messages.length;
+      }
+
+      schedule(TYPE_DELAY_MS);
+    };
+
+    element.textContent = EMPTY_TEXT;
+    update();
+  }
+
+  function initialiseTypewriters(): void {
+    document
+      .querySelectorAll<HTMLElement>("[data-typewriter]")
+      .forEach(initialiseTypewriter);
+  }
+
+  function stopTypewriters(): void {
+    activeTimers.forEach((timerId) => window.clearTimeout(timerId));
+    activeTimers.clear();
+  }
+
+  initialiseTypewriters();
+  document.addEventListener("astro:page-load", initialiseTypewriters);
+  document.addEventListener("astro:before-swap", stopTypewriters);
 </script>

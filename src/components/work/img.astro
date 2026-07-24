@@ -1,17 +1,20 @@
 ---
-// img.astro
-type Props = {
-  images?: string[];
-};
-const { images = [] } = Astro.props;
+interface Props {
+  images?: readonly string[];
+  title?: string;
+}
+
+const { images = [], title = "Project" } = Astro.props;
 ---
 
-<div id="gallery" class="grid grid-cols-1 sm:grid-cols-6 gap-4">
+<div data-gallery class="grid grid-cols-1 sm:grid-cols-6 gap-4">
   {
-    images.map((src: string) => (
+    images.map((src, index) => (
       <img
         src={src}
-        alt=""
+        alt={`${title} project image ${index + 1}`}
+        loading="lazy"
+        decoding="async"
         class="w-full h-full object-cover opacity-0 transition-opacity duration-300"
       />
     ))
@@ -19,68 +22,59 @@ const { images = [] } = Astro.props;
 </div>
 
 <script>
-  function initGallery() {
-    const gallery = document.getElementById("gallery");
-    if (!gallery) return;
+  type ImageShape = "wide" | "square" | "tall";
 
-    const imgs = Array.from(
-      gallery.querySelectorAll<HTMLImageElement>("img"),
-    );
+  function initGalleries(): void {
+    document.querySelectorAll<HTMLElement>("[data-gallery]").forEach((gallery) => {
+      if (gallery.dataset.initialized === "true") return;
+      gallery.dataset.initialized = "true";
 
-    if (imgs.length === 0 || gallery.dataset.initialized) return;
-    gallery.dataset.initialized = "true";
+      const images = Array.from(gallery.querySelectorAll<HTMLImageElement>("img"));
+      if (images.length === 0) return;
 
-    function classify(ratio: number): "wide" | "square" | "tall" {
-      if (!Number.isFinite(ratio) || ratio <= 0) return "square";
-      if (ratio > 1.6) return "wide";
-      if (ratio >= 0.8) return "square";
-      return "tall";
-    }
+      const classify = (ratio: number): ImageShape => {
+        if (!Number.isFinite(ratio) || ratio <= 0) return "square";
+        if (ratio > 1.6) return "wide";
+        if (ratio >= 0.8) return "square";
+        return "tall";
+      };
 
-    function applySpan(
-      img: HTMLImageElement,
-      type: "wide" | "square" | "tall",
-    ) {
-      const spans = {
+      const spans: Record<ImageShape, string> = {
         wide: "sm:col-span-6",
         square: "sm:col-span-3",
         tall: "sm:col-span-2",
       };
-      img.classList.add(spans[type]);
-      img.classList.remove("opacity-0");
-    }
 
-    Promise.all(
-      imgs.map(
-        (img) =>
-          new Promise<void>((resolve) => {
-            if (img.complete && img.naturalWidth > 0) {
-              resolve();
-            } else {
-              img.addEventListener("load", () => resolve(), { once: true });
-              img.addEventListener("error", () => resolve(), { once: true });
-            }
-          }),
-      ),
-    ).then(() => {
-      const sorted = [...imgs].sort((a, b) => {
-        const order = { wide: 0, square: 1, tall: 2 };
-        return (
-          order[classify(a.naturalWidth / a.naturalHeight)] -
-          order[classify(b.naturalWidth / b.naturalHeight)]
-        );
-      });
+      Promise.all(
+        images.map(
+          (image) =>
+            new Promise<void>((resolve) => {
+              if (image.complete) return resolve();
+              image.addEventListener("load", () => resolve(), { once: true });
+              image.addEventListener("error", () => resolve(), { once: true });
+            }),
+        ),
+      ).then(() => {
+        const order: Record<ImageShape, number> = { wide: 0, square: 1, tall: 2 };
+        const sorted = [...images].sort((a, b) => {
+          const aShape = classify(a.naturalWidth / a.naturalHeight);
+          const bShape = classify(b.naturalWidth / b.naturalHeight);
+          return order[aShape] - order[bShape];
+        });
 
-      sorted.forEach((img) => gallery.appendChild(img));
-
-      sorted.forEach((img) => {
-        if (img.naturalWidth === 0) return; // billedet fejlede - lad det være skjult
-        applySpan(img, classify(img.naturalWidth / img.naturalHeight));
+        for (const image of sorted) {
+          gallery.appendChild(image);
+          if (image.naturalWidth === 0) {
+            image.remove();
+            continue;
+          }
+          image.classList.add(spans[classify(image.naturalWidth / image.naturalHeight)]);
+          image.classList.remove("opacity-0");
+        }
       });
     });
   }
 
-  initGallery();
-
-  document.addEventListener("astro:page-load", initGallery);
+  initGalleries();
+  document.addEventListener("astro:page-load", initGalleries);
 </script>

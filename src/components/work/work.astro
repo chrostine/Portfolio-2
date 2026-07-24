@@ -1,147 +1,115 @@
 ---
-// work.astro
 import Case from "./case.astro";
 import { casearray } from "../../scripts/casearray";
 ---
 
-<div class="case-scroll flex flex-row overflow-x-auto px-5 gap-5 pb-5">
+<div data-case-scroll class="case-scroll flex flex-row overflow-x-auto px-5 gap-5 pb-5">
   {
-    casearray.map((c) => (
+    casearray.map((item) => (
       <Case
-        href={`${c.slug}`}
-        video={c.video}
-        titel={c.titel}
-        tekst={c.displayText}
-        programs={c.programs ?? []}
+        href={`/${encodeURIComponent(item.slug)}`}
+        slug={item.slug}
+        video={item.video}
+        titel={item.titel}
+        tekst={item.displayText}
+        programs={item.programs}
       />
     ))
   }
 </div>
 
-
-<script is:inline>
+<script>
   const SCROLL_KEY = "case-scroll-position";
 
-  function safeGetItem(key) {
+  function safeGetItem(key: string): string | null {
     try {
-      return sessionStorage.getItem(key);
-    } catch (err) {
-      console.warn("sessionStorage utilgængelig (get):", err);
+      return window.sessionStorage.getItem(key);
+    } catch {
       return null;
     }
   }
 
-  function safeSetItem(key, value) {
+  function safeSetItem(key: string, value: string): void {
     try {
-      sessionStorage.setItem(key, value);
-    } catch (err) {
-      console.warn("sessionStorage utilgængelig (set):", err);
+      window.sessionStorage.setItem(key, value);
+    } catch {
+      // Storage kan være slået fra uden at siden skal fejle.
     }
   }
 
-  function initHorizontalScroll() {
-    const container = document.querySelector(".case-scroll");
-    if (!container || container.dataset.scrollInitialized) return;
-    container.dataset.scrollInitialized = "true";
+  function initHorizontalScroll(): void {
+    document.querySelectorAll<HTMLElement>("[data-case-scroll]").forEach((container) => {
+      if (container.dataset.scrollInitialized === "true") return;
+      container.dataset.scrollInitialized = "true";
 
-    // --- Genopret gemt position FØRST, og brug den til at seede targetScroll/currentScroll ---
-    const saved = safeGetItem(SCROLL_KEY);
-    const savedValue = saved !== null ? parseInt(saved, 10) : NaN;
-    const initial = Number.isFinite(savedValue) && savedValue >= 0
-      ? savedValue
-      : container.scrollLeft;
+      const savedValue = Number.parseInt(safeGetItem(SCROLL_KEY) ?? "", 10);
+      const initial = Number.isFinite(savedValue) && savedValue >= 0
+        ? savedValue
+        : container.scrollLeft;
 
-    let targetScroll = initial;
-    let currentScroll = initial;
-    let animating = false;
-    let rafId = null;
-    const ease = 0.08;
+      let targetScroll = initial;
+      let currentScroll = initial;
+      let animationFrame: number | null = null;
+      let touching = false;
+      const ease = 0.08;
 
-    container.scrollLeft = initial;
+      const clamp = (value: number): number => {
+        const max = Math.max(0, container.scrollWidth - container.clientWidth);
+        return Math.min(Math.max(0, value), max);
+      };
 
-    // Layout er muligvis ikke helt klar lige efter view transition,
-    // så vi korrigerer én gang mere på næste frame og clamper til det reelle maksimum.
-    requestAnimationFrame(() => {
-      const maxScroll = container.scrollWidth - container.clientWidth;
-      const clamped = Math.min(Math.max(0, initial), maxScroll);
-      container.scrollLeft = clamped;
-      targetScroll = clamped;
-      currentScroll = clamped;
-    });
-
-    function animate() {
-      currentScroll += (targetScroll - currentScroll) * ease;
-
-      if (Math.abs(targetScroll - currentScroll) < 0.5) {
-        currentScroll = targetScroll;
-        container.scrollLeft = currentScroll;
-        animating = false;
-        rafId = null;
-        return;
-      }
-
-      container.scrollLeft = currentScroll;
-      rafId = requestAnimationFrame(animate);
-    }
-
-    // --- Wheel/touchpad: konverter lodret scroll til vandret, med easing ---
-    container.addEventListener(
-      "wheel",
-      (e) => {
-        if (container.scrollWidth <= container.clientWidth) return;
-        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-
-        e.preventDefault();
-
-        const maxScroll = container.scrollWidth - container.clientWidth;
-        targetScroll = Math.min(
-          Math.max(0, targetScroll + e.deltaY),
-          maxScroll
-        );
-
-        if (!animating) {
-          animating = true;
-          rafId = requestAnimationFrame(animate);
+      const animate = (): void => {
+        currentScroll += (targetScroll - currentScroll) * ease;
+        if (Math.abs(targetScroll - currentScroll) < 0.5) {
+          currentScroll = targetScroll;
+          container.scrollLeft = currentScroll;
+          animationFrame = null;
+          return;
         }
-      },
-      { passive: false }
-    );
+        container.scrollLeft = currentScroll;
+        animationFrame = window.requestAnimationFrame(animate);
+      };
 
-    // --- Touch: lad browseren håndtere selve swipet nativt ---
-    let isTouching = false;
+      window.requestAnimationFrame(() => {
+        const clamped = clamp(initial);
+        container.scrollLeft = clamped;
+        targetScroll = clamped;
+        currentScroll = clamped;
+      });
 
-    container.addEventListener(
-      "touchstart",
-      () => {
-        isTouching = true;
-        animating = false;
-        if (rafId) cancelAnimationFrame(rafId);
-      },
-      { passive: true }
-    );
+      container.addEventListener("wheel", (event) => {
+        if (container.scrollWidth <= container.clientWidth) return;
+        if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
 
-    container.addEventListener(
-      "touchend",
-      () => {
-        isTouching = false;
+        event.preventDefault();
+        targetScroll = clamp(targetScroll + event.deltaY);
+        if (animationFrame === null) {
+          animationFrame = window.requestAnimationFrame(animate);
+        }
+      }, { passive: false });
+
+      container.addEventListener("touchstart", () => {
+        touching = true;
+        if (animationFrame !== null) {
+          window.cancelAnimationFrame(animationFrame);
+          animationFrame = null;
+        }
+      }, { passive: true });
+
+      container.addEventListener("touchend", () => {
+        touching = false;
         targetScroll = container.scrollLeft;
         currentScroll = container.scrollLeft;
-      },
-      { passive: true }
-    );
+      }, { passive: true });
 
-    // --- Fælles: gem position løbende, uanset input-metode ---
-    container.addEventListener(
-      "scroll",
-      () => {
-        if (isTouching) {
+      container.addEventListener("scroll", () => {
+        if (touching) {
           targetScroll = container.scrollLeft;
           currentScroll = container.scrollLeft;
         }
-        safeSetItem(SCROLL_KEY, String(container.scrollLeft));
-      },
-      { passive: true }
-    );
+        safeSetItem(SCROLL_KEY, String(Math.round(container.scrollLeft)));
+      }, { passive: true });
+    });
   }
 
   initHorizontalScroll();

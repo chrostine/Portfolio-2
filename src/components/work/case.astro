@@ -1,62 +1,194 @@
 ---
-// case.astro
 import Overskrift from "../text/overskrift.astro";
 import Underoverskrift from "../text/underoverskrift.astro";
 import Brodtekst from "../text/brodtekst.astro";
 
-const { video, href, titel, tekst, programs = [] } = Astro.props;
+interface Props {
+  video: string;
+  href: string;
+  slug: string;
+  titel: string;
+  tekst: string;
+  programs?: readonly string[];
+}
+
+const { video, href, slug, titel, tekst, programs = [] } = Astro.props;
+const transitionName = `case-img-${slug}`;
 ---
 
-<a href={href} class="group md:w-xl w-full shrink-0 bg-hvid text-sort">
-  <div class="grid grid-cols-1">
-    <!-- video -->
-    <div class="relative h-full bg-center bg-no-repeat bg-cover">
-      <video
-        src={video}
-        muted
-        loop
-        playsinline
-        preload="auto"
-        class="w-full h-full object-cover"
-        transition:name={`case-img-${titel}`}></video>
-    </div>
+<a
+  href={href}
+  class="case-card group md:w-xl w-full shrink-0 bg-hvid text-sort"
+>
+  <article class="grid grid-cols-1">
+    <div
+  class="relative aspect-video overflow-hidden bg-center bg-no-repeat bg-cover"
+  transition:name={transitionName}
+  transition:animate="fade"
+>
+  <video
+    src={video}
+    muted
+    loop
+    playsinline
+    preload="metadata"
+    aria-label={`Preview video for ${titel}`}
+    class="absolute inset-0 w-full h-full object-cover"
+  ></video>
+</div>
 
-    <!-- beskrivelse -->
     <div class="px-10 flex flex-col gap-6 h-full py-5">
       <div>
-        <Overskrift>
-          <h2>{titel}</h2>
-        </Overskrift>
-        <Underoverskrift><h3>{programs.join(", ")}</h3></Underoverskrift>
+        <Overskrift><h2>{titel}</h2></Overskrift>
+        <Underoverskrift><p>{programs.join(", ")}</p></Underoverskrift>
       </div>
       <Brodtekst><p>{tekst}</p></Brodtekst>
     </div>
-  </div>
+  </article>
 </a>
 
-<!-- afspiller video ved hover -->
-<script is:inline>
-  function initVideos() {
-    document.querySelectorAll("a.group").forEach((link) => {
-      const video = link.querySelector("video");
-      if (!video || video.dataset.initialized) return;
-      video.dataset.initialized = "true";
+<script>
+  const initializedLinks = new WeakSet<HTMLAnchorElement>();
+  const observedVideos = new WeakSet<HTMLVideoElement>();
 
-      // Tving browseren til at loade videoen efter view transition
+  function ensureVideoSource(video: HTMLVideoElement): void {
+    if (!video.isConnected) return;
+
+    if (
+      video.readyState === HTMLMediaElement.HAVE_NOTHING ||
+      !video.currentSrc
+    ) {
       video.load();
-
-      link.addEventListener("mouseenter", () => {
-        const p = video.play();
-        if (p) p.catch(() => {});
-      });
-
-      link.addEventListener("mouseleave", () => {
-        video.pause();
-        video.currentTime = 0;
-      });
-    });
+    }
   }
 
-  initVideos();
-  document.addEventListener("astro:page-load", initVideos);
+  async function playPreview(
+    video: HTMLVideoElement,
+  ): Promise<void> {
+    if (!video.isConnected) return;
+
+    ensureVideoSource(video);
+
+    try {
+      await video.play();
+    } catch (error) {
+      if (
+        error instanceof DOMException &&
+        [
+          "AbortError",
+          "NotAllowedError",
+          "InvalidStateError",
+        ].includes(error.name)
+      ) {
+        return;
+      }
+
+      console.warn(
+        "Preview-videoen kunne ikke afspilles:",
+        error,
+      );
+    }
+  }
+
+  function stopPreview(video: HTMLVideoElement): void {
+    if (!video.isConnected) return;
+
+    video.pause();
+
+    if (video.readyState === HTMLMediaElement.HAVE_NOTHING) {
+      return;
+    }
+
+    try {
+      video.currentTime = 0;
+    } catch {
+      // Videoen kan være blevet fjernet under navigation.
+    }
+  }
+
+  function createVideoObserver(): IntersectionObserver {
+    return new IntersectionObserver(
+      (entries, observer) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+
+          const video = entry.target;
+
+          if (!(video instanceof HTMLVideoElement)) {
+            continue;
+          }
+
+          /*
+           * Indlæs metadata for videoer, der er synlige eller
+           * snart bliver synlige. Videoen afspilles ikke endnu.
+           */
+          ensureVideoSource(video);
+
+          /*
+           * Når videoen først er klargjort, behøver vi ikke
+           * observere den længere.
+           */
+          observer.unobserve(video);
+        }
+      },
+      {
+        /*
+         * Start indlæsningen lidt før kortet kommer ind i
+         * det synlige område ved vandret scroll.
+         */
+        rootMargin: "0px 500px",
+        threshold: 0.01,
+      },
+    );
+  }
+
+  let videoObserver: IntersectionObserver | null = null;
+
+  function initVideos(): void {
+    if (!videoObserver) {
+      videoObserver = createVideoObserver();
+    }
+
+    document
+      .querySelectorAll<HTMLAnchorElement>("a.case-card")
+      .forEach((link) => {
+        const video =
+          link.querySelector<HTMLVideoElement>("video");
+
+        if (!video) return;
+
+        /*
+         * Observer videoen, men kald ikke video.load()
+         * direkte for alle videoer.
+         */
+        if (!observedVideos.has(video)) {
+          observedVideos.add(video);
+          videoObserver?.observe(video);
+        }
+
+        if (initializedLinks.has(link)) return;
+        initializedLinks.add(link);
+
+        link.addEventListener("mouseenter", () => {
+          void playPreview(video);
+        });
+
+        link.addEventListener("mouseleave", () => {
+          stopPreview(video);
+        });
+
+        link.addEventListener("focusin", () => {
+          void playPreview(video);
+        });
+
+        link.addEventListener("focusout", () => {
+          stopPreview(video);
+        });
+      });
+  }
+
+  document.addEventListener(
+    "astro:page-load",
+    initVideos,
+  );
 </script>

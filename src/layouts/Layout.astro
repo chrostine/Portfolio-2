@@ -1,19 +1,34 @@
 ---
 import "../styles/global.css";
 import { ClientRouter } from "astro:transitions";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Chrostine's portfolio",
+  description = "Selected design and development projects by Chrostine.",
+} = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <ClientRouter />
+    <ClientRouter fallback="swap" />
+
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/some/favicon.png" />
-    <link rel="icon" href="/some/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <link rel="icon" type="image/png" href="/some/favicon.png" />
+
     <meta name="generator" content={Astro.generator} />
-    <title>chrostine's portfolio</title>
+    <title>{title}</title>
   </head>
+
   <body>
     <slot />
   </body>
