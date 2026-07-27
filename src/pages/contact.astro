@@ -1,13 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Nav from "../components/UI/nav.astro";
-
-import Some from "../components/UI/some.astro";
-import Titel from "../components/text/titel.astro";
-
-import LinkedIn from "../assets/linkedin.svg";
-import GitHub from "../assets/github.svg";
-import Instagram from "../assets/instagram.svg";
+import Contact from "../components/UI/contact.astro";
 ---
 
 <Layout>
@@ -22,29 +16,8 @@ import Instagram from "../assets/instagram.svg";
           class="h-[400px] w-auto object-cover"
         />
       </div>
-      <div class="flex md:justify-start justify-center py-10">
-        <div class="flex items-center flex-col text-sm">
-          <div class="pb-5"><Titel>contact</Titel></div>
-
-          <p>Christine Wrang Swierkosz</p>
-          <p>christineswierkosz@outlook.dk</p>
-          <p>2094 0242</p>
-
-          <Some class="text-hvid">
-            <a
-              href="https://dk.linkedin.com/in/christine-swierkosz-38359a289"
-              target="_blank"
-            >
-              <LinkedIn class="h-9 w-auto" fill="currentColor" />
-            </a>
-            <a href="https://github.com/chrostine" target="_blank">
-              <GitHub class="h-9 w-auto" fill="currentColor" />
-            </a>
-            <a href="https://www.instagram.com/wrangstrik/" target="_blank">
-              <Instagram class="h-9 w-auto" fill="currentColor" />
-            </a>
-          </Some>
-        </div>
+      <div class="flex md:justify-start justify-center">
+        <Contact/>
       </div>
     </div>
   </div>

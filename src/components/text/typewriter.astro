@@ -1,0 +1,123 @@
+---
+interface Props {
+  delay?: number;
+  class?: string;
+}
+
+const {
+  delay = 70,
+  class: className = "",
+} = Astro.props;
+---
+
+<span
+  class={`whitespace-pre-line ${className}`}
+  data-typewriter
+  data-delay={delay}
+>
+  <slot />
+</span>
+
+<script>
+  const DEFAULT_DELAY = 70;
+  const EMPTY_TEXT = "\u00A0";
+
+  const timers = new Map<HTMLElement, number>();
+
+  function clearTimer(element: HTMLElement): void {
+    const timer = timers.get(element);
+
+    if (timer !== undefined) {
+      window.clearTimeout(timer);
+      timers.delete(element);
+    }
+  }
+
+  function animate(element: HTMLElement): void {
+    clearTimer(element);
+
+    const text =
+      element.dataset.typewriterText ??
+      element.textContent?.trim();
+
+    if (!text) return;
+
+    element.dataset.typewriterText = text;
+
+    if (element.dataset.typewriterDone === "true") {
+      element.textContent = text;
+      return;
+    }
+
+    if (
+      window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches
+    ) {
+      element.textContent = text;
+      element.dataset.typewriterDone = "true";
+      return;
+    }
+
+    const selectedDelay = Number(element.dataset.delay);
+
+    const delay =
+      Number.isFinite(selectedDelay) &&
+      selectedDelay >= 0
+        ? selectedDelay
+        : DEFAULT_DELAY;
+
+    let index = 0;
+
+    element.textContent = EMPTY_TEXT;
+
+    function write(): void {
+      if (!element.isConnected) {
+        clearTimer(element);
+        return;
+      }
+
+      index += 1;
+      element.textContent = text.slice(0, index);
+
+      if (index >= text.length) {
+        element.dataset.typewriterDone = "true";
+        timers.delete(element);
+        return;
+      }
+
+      const timer = window.setTimeout(write, delay);
+      timers.set(element, timer);
+    }
+
+    write();
+  }
+
+  function initialiseTypewriters(): void {
+    document
+      .querySelectorAll<HTMLElement>(
+        "[data-typewriter]",
+      )
+      .forEach(animate);
+  }
+
+  function stopTypewriters(): void {
+    timers.forEach((timer) => {
+      window.clearTimeout(timer);
+    });
+
+    timers.clear();
+  }
+
+  initialiseTypewriters();
+
+  document.addEventListener(
+    "astro:page-load",
+    initialiseTypewriters,
+  );
+
+  document.addEventListener(
+    "astro:before-swap",
+    stopTypewriters,
+  );
+</script>

@@ -1,33 +1,7 @@
 ---
-import Some from "./some.astro";
-import Titel from "../text/titel.astro";
-
-import LinkedIn from "../../assets/linkedin.svg";
-import GitHub from "../../assets/github.svg";
-import Instagram from "../../assets/instagram.svg";
+import Contact from "./contact.astro";
 ---
 
 <div class="bg-sort text-hvid flex justify-center py-10">
-  <div class="flex items-center flex-col text-sm">
-    <div class="pb-5"><Titel>contact</Titel></div>
-
-    <p>Christine Wrang Swierkosz</p>
-    <p>christineswierkosz@outlook.dk</p>
-    <p>2094 0242</p>
-
-    <Some>
-      <a
-        href="https://dk.linkedin.com/in/christine-swierkosz-38359a289"
-        target="_blank"
-      >
-        <LinkedIn class="h-9 w-auto" fill="currentColor" />
-      </a>
-      <a href="https://github.com/chrostine" target="_blank">
-        <GitHub class="h-9 w-auto" fill="currentColor" />
-      </a>
-      <a href="https://www.instagram.com/wrangstrik/" target="_blank">
-        <Instagram class="h-9 w-auto" fill="currentColor" />
-      </a>
-    </Some>
-  </div>
+  <Contact/>
 </div>

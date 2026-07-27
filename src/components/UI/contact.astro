@@ -1,0 +1,35 @@
+---
+import Some from "./some.astro";
+import Overskrift from "../text/overskrift.astro";
+
+import LinkedIn from "../../assets/linkedin.svg";
+import GitHub from "../../assets/github.svg";
+import Instagram from "../../assets/instagram.svg";
+---
+
+<div class="flex items-center flex-col text-sm">
+    <div class="pb-5">
+        <Overskrift>
+            <h2>contact me (:</h2>
+        </Overskrift>
+    </div>
+
+    <p>Christine Wrang Swierkosz</p>
+    <p>christineswierkosz@outlook.dk</p>
+    <p>2094 0242</p>
+
+    <Some>
+      <a
+        href="https://dk.linkedin.com/in/christine-swierkosz-38359a289"
+        target="_blank"
+      >
+        <LinkedIn class="h-9 w-auto" fill="currentColor" />
+      </a>
+      <a href="https://github.com/chrostine" target="_blank">
+        <GitHub class="h-9 w-auto" fill="currentColor" />
+      </a>
+      <a href="https://www.instagram.com/wrangstrik/" target="_blank">
+        <Instagram class="h-9 w-auto" fill="currentColor" />
+      </a>
+    </Some>
+  </div>
