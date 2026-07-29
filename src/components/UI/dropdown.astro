@@ -1,0 +1,476 @@
+---
+interface Props {
+  titel: string;
+}
+
+const { titel } = Astro.props;
+
+const accordionId = `accordion-${crypto.randomUUID()}`;
+---
+
+
+  <div
+    class="accordion-item"
+    data-accordion
+    data-state="closed"
+  >
+    <button
+      type="button"
+      class="accordion-toggle flex cursor-pointer gap-1 text-left text-base hover:text-gron"
+      aria-expanded="false"
+      aria-controls={accordionId}
+    >
+      <span
+        class="accordion-icon font-underoverskrift"
+        aria-hidden="true"
+      >
+        [+]
+      </span>
+
+      <h3 class="uppercase">{titel}</h3>
+    </button>
+
+    <div
+      id={accordionId}
+      class="accordion-content"
+      hidden
+    >
+      <div class="typewriter-wrapper pt-5">
+        <slot />
+      </div>
+    </div>
+  </div>
+
+
+<style>
+  .typewriter-wrapper {
+    overflow: hidden;
+  }
+
+  .typewriter-active::after {
+    content: "|";
+    display: inline;
+    animation: blink 0.7s step-end infinite;
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .typewriter-active::after {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  interface StoredText {
+    node: Text;
+    text: string;
+  }
+
+  type AccordionState =
+    | "closed"
+    | "opening"
+    | "open"
+    | "closing";
+
+  interface AnimationOptions {
+    texts: StoredText[];
+    direction: "forward" | "backward";
+    wrapper: HTMLElement;
+    setTimer: (timer: number) => void;
+    onDone: () => void;
+  }
+
+  // HASTIGHED
+  const TYPE_DELAY_MS = 10;
+
+  // Sletning HASTIGHED
+  const DELETE_DELAY_MS = 5;
+
+  function initialiseAccordions(): void {
+    document
+      .querySelectorAll<HTMLElement>("[data-accordion]")
+      .forEach(initialiseAccordion);
+  }
+
+  function initialiseAccordion(item: HTMLElement): void {
+    if (item.dataset.initialised === "true") return;
+
+    const button =
+      item.querySelector<HTMLButtonElement>(
+        ".accordion-toggle",
+      );
+
+    const content =
+      item.querySelector<HTMLElement>(
+        ".accordion-content",
+      );
+
+    const wrapper =
+      item.querySelector<HTMLElement>(
+        ".typewriter-wrapper",
+      );
+
+    const icon =
+      item.querySelector<HTMLElement>(
+        ".accordion-icon",
+      );
+
+    if (!button || !content || !wrapper || !icon) return;
+
+    const accordionButton = button;
+    const accordionContent = content;
+    const typewriterWrapper = wrapper;
+    const accordionIcon = icon;
+
+    item.dataset.initialised = "true";
+
+    const originalTexts =
+      storeTextNodes(typewriterWrapper);
+
+    let activeTimer: number | undefined;
+    let animationVersion = 0;
+
+    function clearAnimation(): void {
+      animationVersion += 1;
+
+      if (activeTimer !== undefined) {
+        window.clearTimeout(activeTimer);
+        activeTimer = undefined;
+      }
+
+      removeCursor(typewriterWrapper);
+    }
+
+    function restoreText(): void {
+      originalTexts.forEach(({ node, text }) => {
+        node.textContent = text;
+      });
+    }
+
+    function setState(state: AccordionState): void {
+      item.dataset.state = state;
+    }
+
+    function finishOpen(): void {
+      activeTimer = undefined;
+      restoreText();
+      removeCursor(typewriterWrapper);
+
+      setState("open");
+
+      accordionButton.setAttribute(
+        "aria-expanded",
+        "true",
+      );
+
+      accordionIcon.textContent = "[-]";
+    }
+
+    function finishClose(): void {
+      activeTimer = undefined;
+      restoreText();
+      removeCursor(typewriterWrapper);
+
+      accordionContent.hidden = true;
+
+      setState("closed");
+
+      accordionButton.setAttribute(
+        "aria-expanded",
+        "false",
+      );
+
+      accordionIcon.textContent = "[+]";
+    }
+
+    function openAccordion(): void {
+      clearAnimation();
+
+      const currentVersion = animationVersion;
+
+      setState("opening");
+
+      accordionContent.hidden = false;
+
+      accordionButton.setAttribute(
+        "aria-expanded",
+        "true",
+      );
+
+      accordionIcon.textContent = "[-]";
+
+      if (prefersReducedMotion()) {
+        finishOpen();
+        return;
+      }
+
+      animateText({
+        texts: originalTexts,
+        direction: "forward",
+        wrapper: typewriterWrapper,
+
+        setTimer(timer) {
+          activeTimer = timer;
+        },
+
+        onDone() {
+          if (currentVersion !== animationVersion) return;
+          finishOpen();
+        },
+      });
+    }
+
+    function closeAccordion(): void {
+      clearAnimation();
+
+      const currentVersion = animationVersion;
+
+      setState("closing");
+
+      accordionButton.setAttribute(
+        "aria-expanded",
+        "false",
+      );
+
+      accordionIcon.textContent = "[+]";
+
+      if (prefersReducedMotion()) {
+        finishClose();
+        return;
+      }
+
+      animateText({
+        texts: originalTexts,
+        direction: "backward",
+        wrapper: typewriterWrapper,
+
+        setTimer(timer) {
+          activeTimer = timer;
+        },
+
+        onDone() {
+          if (currentVersion !== animationVersion) return;
+          finishClose();
+        },
+      });
+    }
+
+    accordionButton.addEventListener("click", () => {
+      const state =
+        (item.dataset.state as AccordionState) ??
+        "closed";
+
+      if (
+        state === "closed" ||
+        state === "closing"
+      ) {
+        openAccordion();
+      } else {
+        closeAccordion();
+      }
+    });
+  }
+
+  function animateText({
+    texts,
+    direction,
+    wrapper,
+    setTimer,
+    onDone,
+  }: AnimationOptions): void {
+    removeCursor(wrapper);
+
+    if (texts.length === 0) {
+      onDone();
+      return;
+    }
+
+    if (direction === "forward") {
+      animateForward();
+    } else {
+      animateBackward();
+    }
+
+    function animateForward(): void {
+      texts.forEach(({ node }) => {
+        node.textContent = "";
+      });
+
+      let nodeIndex = 0;
+      let characterIndex = 0;
+
+      function update(): void {
+        if (nodeIndex >= texts.length) {
+          removeCursor(wrapper);
+          onDone();
+          return;
+        }
+
+        const current = texts[nodeIndex];
+
+        moveCursor(
+          wrapper,
+          current.node.parentElement,
+        );
+
+        characterIndex += 1;
+
+        current.node.textContent =
+          current.text.slice(0, characterIndex);
+
+        if (characterIndex >= current.text.length) {
+          nodeIndex += 1;
+          characterIndex = 0;
+        }
+
+        if (nodeIndex >= texts.length) {
+          removeCursor(wrapper);
+          onDone();
+          return;
+        }
+
+        const timer = window.setTimeout(
+          update,
+          TYPE_DELAY_MS,
+        );
+
+        setTimer(timer);
+      }
+
+      update();
+    }
+
+    function animateBackward(): void {
+      texts.forEach(({ node, text }) => {
+        node.textContent = text;
+      });
+
+      let nodeIndex = texts.length - 1;
+
+      let characterIndex =
+        texts[nodeIndex]?.text.length ?? 0;
+
+      function update(): void {
+        if (nodeIndex < 0) {
+          removeCursor(wrapper);
+          onDone();
+          return;
+        }
+
+        const current = texts[nodeIndex];
+
+        moveCursor(
+          wrapper,
+          current.node.parentElement,
+        );
+
+        characterIndex -= 1;
+
+        current.node.textContent =
+          current.text.slice(
+            0,
+            Math.max(characterIndex, 0),
+          );
+
+        if (characterIndex <= 0) {
+          nodeIndex -= 1;
+
+          if (nodeIndex >= 0) {
+            characterIndex =
+              texts[nodeIndex].text.length;
+          }
+        }
+
+        if (nodeIndex < 0) {
+          removeCursor(wrapper);
+          onDone();
+          return;
+        }
+
+        const timer = window.setTimeout(
+          update,
+          DELETE_DELAY_MS,
+        );
+
+        setTimer(timer);
+      }
+
+      update();
+    }
+  }
+
+  function moveCursor(
+    wrapper: HTMLElement,
+    element: HTMLElement | null,
+  ): void {
+    removeCursor(wrapper);
+
+    element?.classList.add(
+      "typewriter-active",
+    );
+  }
+
+  function removeCursor(
+    wrapper: HTMLElement,
+  ): void {
+    wrapper
+      .querySelectorAll(".typewriter-active")
+      .forEach((element) => {
+        element.classList.remove(
+          "typewriter-active",
+        );
+      });
+  }
+
+  function storeTextNodes(
+    element: Node,
+  ): StoredText[] {
+    return getTextNodes(element).map((node) => ({
+      node,
+      text: node.textContent ?? "",
+    }));
+  }
+
+  function getTextNodes(element: Node): Text[] {
+    const result: Text[] = [];
+
+    const walker = document.createTreeWalker(
+      element,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode(node) {
+          return node.textContent?.trim()
+            ? NodeFilter.FILTER_ACCEPT
+            : NodeFilter.FILTER_REJECT;
+        },
+      },
+    );
+
+    let node: Node | null;
+
+    while ((node = walker.nextNode())) {
+      result.push(node as Text);
+    }
+
+    return result;
+  }
+
+  function prefersReducedMotion(): boolean {
+    return window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+  }
+
+  initialiseAccordions();
+
+  document.addEventListener(
+    "astro:page-load",
+    initialiseAccordions,
+  );
+</script>

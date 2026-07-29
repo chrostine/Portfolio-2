@@ -18,7 +18,7 @@ const transitionName = `case-img-${slug}`;
 
 <a
   href={href}
-  class="case-card group md:w-xl w-full shrink-0 bg-hvid text-sort"
+  class="case-card group md:w-xl w-xs shrink-0 bg-hvid text-sort"
 >
   <article class="grid grid-cols-1">
     <div
@@ -37,7 +37,7 @@ const transitionName = `case-img-${slug}`;
   ></video>
 </div>
 
-    <div class="px-10 flex flex-col gap-6 h-full py-5">
+    <div class="md:px-10 px-5 flex flex-col gap-6 h-full py-5">
       <div>
         <Overskrift><h2>{titel}</h2></Overskrift>
         <Underoverskrift><h3>{programs.join(", ")}</h3></Underoverskrift>
@@ -102,7 +102,7 @@ const transitionName = `case-img-${slug}`;
     try {
       video.currentTime = 0;
     } catch {
-      // Videoen kan være blevet fjernet under navigation.
+
     }
   }
 
@@ -117,25 +117,11 @@ const transitionName = `case-img-${slug}`;
           if (!(video instanceof HTMLVideoElement)) {
             continue;
           }
-
-          /*
-           * Indlæs metadata for videoer, der er synlige eller
-           * snart bliver synlige. Videoen afspilles ikke endnu.
-           */
           ensureVideoSource(video);
-
-          /*
-           * Når videoen først er klargjort, behøver vi ikke
-           * observere den længere.
-           */
           observer.unobserve(video);
         }
       },
       {
-        /*
-         * Start indlæsningen lidt før kortet kommer ind i
-         * det synlige område ved vandret scroll.
-         */
         rootMargin: "0px 500px",
         threshold: 0.01,
       },
@@ -157,10 +143,6 @@ const transitionName = `case-img-${slug}`;
 
         if (!video) return;
 
-        /*
-         * Observer videoen, men kald ikke video.load()
-         * direkte for alle videoer.
-         */
         if (!observedVideos.has(video)) {
           observedVideos.add(video);
           videoObserver?.observe(video);

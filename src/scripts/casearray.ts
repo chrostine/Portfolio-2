@@ -52,7 +52,7 @@ const cases: readonly Case[] = [
     url: "https://aaben-perlin.netlify.app/",
     titel: `Label generator for "Åben øl"`,
     date: "2026-03-06",
-    programs: ["Figma", "p5.js", "Three.js", "Shoelace", "Photoshop"],
+    programs: ["Figma", "p5.js", "three.js", "Shoelace", "Photoshop"],
     video: "/cases/aaben/aaben.mp4",
     text: [
       "Conceptualization, design and coded solution of a visual design system, which ÅBEN can use to create label designs for their many different beers.",

@@ -4,17 +4,26 @@ import Layout from "../layouts/Layout.astro";
 import Overskrift from "../components/text/overskrift.astro";
 import Underoverskrift from "../components/text/underoverskrift.astro";
 import Brodtekst from "../components/text/brodtekst.astro";
+import BrodtekstNoGap from "../components/text/brodtextnogap.astro";
 import Typewriter from "../components/text/typewriter.astro";
 
 import Nav from "../components/UI/nav.astro";
 import Footer from "../components/UI/footer.astro";
+import Dropdown from "../components/UI/dropdown.astro";
+
+import { casearray } from "../scripts/casearray";
+const programs = [
+  ...new Set(
+    casearray.flatMap((caseItem) => caseItem.programs),
+  ),
+].sort((a, b) => a.localeCompare(b));
 ---
 
 <Layout>
   <div>
     <Nav />
 
-    <div class="mx-auto max-w-7xl grid gap-15 py-15 px-5">
+    <div class="mx-auto max-w-7xl grid md:gap-15 gap-10 md:pt-10 pt-0 pb-15">
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-15">
         <div class="grid gap-15 bg-[url('/some/christine_02.png')] bg-cover bg-center  md:h-auto h-[300px]">
@@ -28,37 +37,77 @@ import Footer from "../components/UI/footer.astro";
               </h3>
             </Underoverskrift>
           </div>
-        
         </div>
-        
-        <div class="md:px-0 px-10 grid gap-5">
+        <div class="md:px-0 px-5 grid gap-5">
           <Overskrift><h2>About me (:</h2></Overskrift>
-          <Brodtekst>
-            <p>
-              I am a coded designer, and I work with digital experiences where
-              technology and creativity merge. I use code as a design tool.
-            </p>
-            <p>
-              I have experience working both independently and in
-              interdisciplinary teams. I am especially motivated when I can help
-              turn ideas into something people can interact with and feel, and I
-              thrive best in projects where I can experiment my way forward.
-            </p>
-            <p>
-              At the moment, I am particularly interested in interaction and
-              gamification as ways to create engaging and meaningful digital
-              experiences.
-            </p>
-            <p>
-              I am always open to new projects and collaborations — especially
-              those that challenge conventional ways of using technology.
-            </p>
-          </Brodtekst>
+          <div class="md:px-0 px-10">
+            <Brodtekst>
+              <p>
+                I am a coded designer, and I work with digital experiences where
+                technology and creativity merge. I use code as a design tool.
+              </p>
+              <p>
+                I have experience working both independently and in
+                interdisciplinary teams. I am especially motivated when I can help
+                turn ideas into something people can interact with and feel, and I
+                thrive best in projects where I can experiment my way forward.
+              </p>
+              <p>
+                At the moment, I am particularly interested in interaction and
+                gamification as ways to create engaging and meaningful digital
+                experiences.
+              </p>
+              <p>
+                I am always open to new projects and collaborations — especially
+                those that challenge conventional ways of using technology.
+              </p>
+              </Brodtekst>
+          </div>
         </div>
       </div>
-       <div class="flex justify-center">
-            <img src="some/figur.svg" />
+
+      
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 xl:px-0 px-5">
+        <Dropdown titel="Experience">
+          <div class="grid gap-5">
+            <BrodtekstNoGap aar="February 2024 — current">
+              <p>Lev, student worker</p>
+            </BrodtekstNoGap>
           </div>
+        </Dropdown>
+        <Dropdown titel="Education">
+          <div class="grid gap-5">
+            <BrodtekstNoGap aar="September 2024 — June 2027">
+              <p>Professional Bachelor’s Degree</p>
+              <p>Visual communication, coded design</p>
+              <p>Danish School of Media and Journalism</p>
+            </BrodtekstNoGap>
+          </div>
+        </Dropdown>
+        <Dropdown titel="Tools and programs">
+          <div class="grid gap-5">
+            <BrodtekstNoGap>
+              {programs.map((program) => (
+              <p>{program}</p>
+              ))}
+            </BrodtekstNoGap>
+          </div>
+        </Dropdown>
+        <Dropdown titel="Languages">
+          <div class="grid gap-5">
+            <BrodtekstNoGap>
+              <p>Danish</p>
+              <p>English</p>
+            </BrodtekstNoGap>
+          </div>
+        </Dropdown>
+      </div>
+
+      <div class="flex justify-center">
+        <img src="some/figur.svg" />
+      </div>
+      
       
     </div>
     <Footer />

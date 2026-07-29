@@ -94,6 +94,9 @@ body {
   .max-w-9xl {
     max-width: 96rem; 
   }
+  .max-w-xs {
+    max-width: 30rem; 
+  }
 }
 
 .overflow-x-auto {
