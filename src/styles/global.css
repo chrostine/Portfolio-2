@@ -37,33 +37,6 @@ body {
 }
 
 @font-face {
-    font-family: "RubikBrokenFax";
-    font-weight: 400;
-    font-style: normal;
-    src: url("/fonts/RubikBrokenFax-Regular.ttf");
-}
-
-@font-face {
-    font-family: "Jacquard12Charted";
-    font-weight: 400;
-    font-style: normal;
-    src: url("/fonts/Jacquard12Charted-Regular.ttf");
-}
-
-@font-face {
-    font-family: "Jersey10" ;
-    font-weight: 400;
-    font-style: normal;
-    src: url("/fonts/Jersey10-Regular.ttf");
-}
-@font-face {
-    font-family: "Jersey15" ;
-    font-weight: 400;
-    font-style: normal;
-    src: url("/fonts/Jersey15-Regular.ttf");
-}
-
-@font-face {
     font-family: "Mori" ;
     font-weight: 400;
     font-style: normal;
@@ -75,7 +48,7 @@ body {
 :root {
   --color-sort: #131313;
   --color-hvid: #f7f7f7;
-  --color-green: #C3F079;
+  --color-gron: #C3F079;
 
   --font-overskrift: "Mori", sans-serif;
   --font-overskrift2: "Mori", sans-serif;
@@ -87,7 +60,7 @@ body {
   /* farver */
   --color-sort: var(--color-sort);
   --color-hvid: var(--color-hvid);
-  --color-green: var(--color-green);
+  --color-gron: var(--color-gron);
 
   /* fonte */
   --font-overskrift: "Mori", sans-serif;

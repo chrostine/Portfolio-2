@@ -17,9 +17,8 @@ import Footer from "../components/UI/footer.astro";
     <div class="mx-auto max-w-7xl grid gap-15 py-15 px-5">
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-15">
-        <div class="grid gap-15">
-          <div>
-            <Overskrift><h2>About</h2></Overskrift>
+        <div class="grid gap-15 bg-[url('/some/christine_02.png')] bg-cover bg-center  md:h-auto h-[300px]">
+          <div class="p-2">
             <Underoverskrift>
               <h3>
                 <Typewriter>
@@ -31,7 +30,9 @@ import Footer from "../components/UI/footer.astro";
           </div>
         
         </div>
-        <div class="md:px-0 px-10">
+        
+        <div class="md:px-0 px-10 grid gap-5">
+          <Overskrift><h2>About me (:</h2></Overskrift>
           <Brodtekst>
             <p>
               I am a coded designer, and I work with digital experiences where
