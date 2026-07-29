@@ -1,0 +1,109 @@
+---
+import Underoverskrift from "../text/underoverskrift.astro";
+import { likearray } from "../../scripts/likearray";
+---
+
+<div class="grid grid-cols-1 gap-5 lg:grid-cols-3 md:grid-cols-2">
+  {
+    likearray.map((item, itemIndex) => (
+      <article
+        class="like-card"
+        data-like-card
+      >
+        <div
+          class="relative aspect-square overflow-hidden"
+          data-like-images
+        >
+          {
+            item.img.map((image, imageIndex) => (
+              <img
+                src={image}
+                alt={`${item.text} – billede ${imageIndex + 1}`}
+                loading={
+                  itemIndex === 0 && imageIndex === 0
+                    ? "eager"
+                    : "lazy"
+                }
+                class:list={[
+                  "absolute inset-0 h-full w-full object-cover",
+                  "transition-opacity duration-300 ease-in-out",
+                  imageIndex === 0
+                    ? "opacity-100"
+                    : "opacity-0",
+                ]}
+                data-like-image
+              />
+            ))
+          }
+        </div>
+
+        <div class="flex flex-col gap-6 py-2 ">
+          <Underoverskrift>
+            <h3>{item.text}</h3>
+          </Underoverskrift>
+        </div>
+      </article>
+    ))
+  }
+</div>
+
+<script>
+  function initialiseLikeCards(): void {
+    document
+      .querySelectorAll<HTMLElement>("[data-like-card]")
+      .forEach((card) => {
+        if (card.dataset.likeInitialised === "true") {
+          return;
+        }
+
+        card.dataset.likeInitialised = "true";
+
+        const images = Array.from(
+          card.querySelectorAll<HTMLImageElement>(
+            "[data-like-image]",
+          ),
+        );
+
+        if (images.length <= 1) return;
+
+        let currentImageIndex = 0;
+
+        function showImage(index: number): void {
+          images.forEach((image, imageIndex) => {
+            const isVisible = imageIndex === index;
+
+            image.classList.toggle(
+              "opacity-100",
+              isVisible,
+            );
+
+            image.classList.toggle(
+              "opacity-0",
+              !isVisible,
+            );
+          });
+        }
+
+        function showNextImage(): void {
+          currentImageIndex =
+            (currentImageIndex + 1) % images.length;
+
+          showImage(currentImageIndex);
+        }
+
+        card.addEventListener("pointerenter", (event) => {
+            if (event.pointerType === "mouse") {
+                showNextImage();
+            }
+        });
+        card.addEventListener("click", showNextImage);
+      });
+  }
+
+  initialiseLikeCards();
+
+  document.addEventListener(
+    "astro:page-load",
+    initialiseLikeCards,
+  );
+</script>
