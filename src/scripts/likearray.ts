@@ -14,17 +14,18 @@ const likes: readonly Like[] = [
   },
   {
     img: [
+      "/like/gustav_3.png",
       "/like/gustav_1.png",
       "/like/gustav_2.png",
-      "/like/gustav_3.png",
+      
     ],
     text: "My boyfriend",
   },
   {
     img: [
+      "/like/garn_3.png",
       "/like/garn_1.png",
       "/like/garn_2.png",
-      "/like/garn_3.png",
     ],
     text: "Knitting and crocheting",
   },
@@ -32,8 +33,6 @@ const likes: readonly Like[] = [
     img: [
       "/like/kaffe_1.png",
       "/like/kaffe_2.png",
-      "/like/kaffe_3.png",
-      "/like/kaffe_4.png",
     ],
     text: "Coffee",
   },
