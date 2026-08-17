@@ -74,20 +74,23 @@ const cases: readonly Case[] = [
     programs: ["Figma", "p5.js"],
     video: "/cases/shecanplay/blob.mp4",
     text: [
-      "Koncept: formlessness.",
-      `“You can remain formless. You can take a form. You can take a form now, you can take a form later. Your choice, your need.”`,
+      "This project explores the concept of formlessness as a flexible visual and conceptual framework for SheCanPlay.",
       "SheCanPlay is a Danish nonprofit organization that works to strengthen young women's and gender minorities' participation, visibility and opportunities in the music industry. The organization offers free talent development programs, community, industry insight and access to creative facilities.",
-      `The organization desires a visual identity that opens up for an 'endorsed brands' structure for the artists who wish to signal their affiliation with SheCanPlay, without overpowering the emerging artist's own identity.`,
+      `“You can remain formless. You can take a form. You can take a form now, you can take a form later. Your choice, your need.”`,
+      "Building on this concept, I designed a visual identity that isn't locked into a single form, but can be shaped by the individual user. I used Figma to research and design a design system, and p5.js to build a prototype of a tool where both SheCanPlay and their artists can give the identity form themselves."
     ],
     displayText:
       "This project explores the concept of formlessness as a flexible visual and conceptual framework for SheCanPlay.",
     imgdisplay: [
+      
+      "/cases/shecanplay/shecanplay12.png",
+      "/cases/shecanplay/shecanplay11.png",
       "/cases/shecanplay/shecanplay3.png",
+      "/cases/shecanplay/shecanplay.gif",
       "/cases/shecanplay/shecanplay4.png",
       "/cases/shecanplay/shecanplay9.png",
       "/cases/shecanplay/shecanplay5.png",
       "/cases/shecanplay/shecanplay7.png",
-      "/cases/shecanplay/shecanplay10.png",
     ],
   },
   {
