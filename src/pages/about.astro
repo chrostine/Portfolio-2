@@ -13,13 +13,15 @@ import Dropdown from "../components/UI/dropdown.astro";
 import Like from "../components/UI/like.astro";
 
 import { casearray } from "../scripts/casearray";
-const programs = [
-  ...new Set(
-    casearray.flatMap((caseItem) => caseItem.programs),
-  ),
-].sort((a, b) => a.localeCompare(b));
 
 let hjerte = "<3";
+
+let programmer = ["Sanity", "Umbraco", "Astro", "Tailwind", "Blender"];
+const programsFromCases = casearray.flatMap((caseItem) => caseItem.programs);
+
+const programs = [
+  ...new Set([...programmer, ...programsFromCases]),
+].sort((a, b) => a.localeCompare(b));
 ---
 
 <Layout>

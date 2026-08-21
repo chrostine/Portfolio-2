@@ -118,28 +118,6 @@ const cases: readonly Case[] = [
     ],
   },
   {
-    slug: "space",
-    url: "https://hovedrum.netlify.app/",
-    titel: "Space - take your thoughts out",
-    date: "2026-06-19",
-    programs: ["Astro", "Generative AI", "Tailwind"],
-    video: "/cases/space/space.mp4",
-    text: [
-      `Space is a concept for a digital tool that helps young people process their thoughts and feelings by combining an AI conversation with the principle behind "walk and talk" therapy.`,
-      "The tool is made for Headspace. Headspace is a free and anonymous counselling service for young people aged 12 to 25, where volunteer counsellors listen without judgement and take their starting point in the young person's own needs.",
-      `The user is met by a chat interface designed to lower the threshold by meeting young people in a format they already know. The messages disappear along the way, so it feels safe to open up and reflect honestly. The AI guides the conversation rather than "treating" it, and the entire experience is designed with ethical and psychological considerations in mind.`,
-      "The aim is to leave the user with greater clarity, to make them feel better equipped to handle their life, and to create a habit of movement in nature while giving the user a bodily experience that it works.",
-      "The visual elements in the product were created using a generative text-to-video AI (Creative Fabrica's AI Video Generator), where I used prompts to train the model to deliver the desired output.",
-    ],
-    displayText:
-      `Space is a concept for a digital tool that helps young people process their thoughts and feelings by combining an AI conversation with the principle behind "walk and talk" therapy.`,
-    imgdisplay: [
-      "/cases/space/space-1.png",
-      "/cases/space/space-2.png",
-      "/cases/space/space.gif",
-    ],
-  },
-  {
     slug: "munich",
     titel: "City Branding: Munich",
     date: "2026-02-06",

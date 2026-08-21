@@ -1,43 +1,56 @@
 ---
+import { Image, getImage } from "astro:assets";
 import Underoverskrift from "../text/underoverskrift.astro";
 import { likearray } from "../../scripts/likearray";
+
+const cardsData = await Promise.all(
+  likearray.map(async (item) => {
+    const [firstImage, ...restImages] = item.img;
+
+    const optimizedRest = await Promise.all(
+      restImages.map(async (image) => {
+        const optimized = await getImage({
+          src: image,
+          width: 600,
+          height: 600,
+        });
+        return optimized.src;
+      }),
+    );
+
+    return {
+      ...item,
+      firstImage,
+      extraImageSrcs: optimizedRest,
+    };
+  }),
+);
 ---
 
 <div class="grid grid-cols-1 gap-5 lg:grid-cols-3 md:grid-cols-2">
   {
-    likearray.map((item, itemIndex) => (
-      <article
-        class="like-card"
-        data-like-card
-      >
+    cardsData.map((item, itemIndex) => (
+      <article class="like-card" data-like-card>
         <div
           class="relative aspect-square overflow-hidden"
           data-like-images
+          data-extra-images={JSON.stringify(item.extraImageSrcs)}
+          data-alt-text={item.text}
         >
-          {
-            item.img.map((image, imageIndex) => (
-              <img
-                src={image}
-                alt={`${item.text} – billede ${imageIndex + 1}`}
-                loading={
-                  itemIndex === 0 && imageIndex === 0
-                    ? "eager"
-                    : "lazy"
-                }
-                class:list={[
-                  "absolute inset-0 h-full w-full object-cover",
-                  "transition-opacity duration-300 ease-in-out",
-                  imageIndex === 0
-                    ? "opacity-100"
-                    : "opacity-0",
-                ]}
-                data-like-image
-              />
-            ))
-          }
+          <Image
+            src={item.firstImage}
+            alt={`${item.text} – billede 1`}
+            width={600}
+            height={600}
+            loading={itemIndex === 0 ? "eager" : "lazy"}
+            fetchpriority={itemIndex === 0 ? "high" : "auto"}
+            class="absolute inset-0 h-full w-full object-cover opacity-100 transition-opacity duration-300 ease-in-out"
+            data-like-image
+            data-index="0"
+          />
         </div>
 
-        <div class="flex flex-col gap-6 py-2 ">
+        <div class="flex flex-col gap-6 py-2">
           <Underoverskrift>
             <h3>{item.text}</h3>
           </Underoverskrift>
@@ -49,61 +62,97 @@ import { likearray } from "../../scripts/likearray";
 
 <script>
   function initialiseLikeCards(): void {
-    document
-      .querySelectorAll<HTMLElement>("[data-like-card]")
-      .forEach((card) => {
-        if (card.dataset.likeInitialised === "true") {
-          return;
-        }
+    const cards = document.querySelectorAll<HTMLElement>(
+      "[data-like-card]",
+    );
 
-        card.dataset.likeInitialised = "true";
+    cards.forEach((card) => {
+      if (card.dataset.likeInitialised === "true") {
+        return;
+      }
+      card.dataset.likeInitialised = "true";
 
-        const images = Array.from(
-          card.querySelectorAll<HTMLImageElement>(
-            "[data-like-image]",
-          ),
-        );
+      const container = card.querySelector<HTMLElement>(
+        "[data-like-images]",
+      );
+      if (!container) return;
 
+      const altText = container.dataset.altText ?? "";
+      const extraImagesRaw = container.dataset.extraImages;
+      const extraImageSrcs: string[] = extraImagesRaw
+        ? JSON.parse(extraImagesRaw)
+        : [];
+
+      let images: HTMLImageElement[] = Array.from(
+        card.querySelectorAll<HTMLImageElement>("[data-like-image]"),
+      );
+
+      let currentImageIndex = 0;
+      let extraImagesLoaded = false;
+
+      function showImage(index: number): void {
+        images.forEach((image, imageIndex) => {
+          const isVisible = imageIndex === index;
+          image.classList.toggle("opacity-100", isVisible);
+          image.classList.toggle("opacity-0", !isVisible);
+        });
+      }
+
+      function loadExtraImagesIfNeeded(): void {
+        if (extraImagesLoaded || extraImageSrcs.length === 0) return;
+        extraImagesLoaded = true;
+
+        extraImageSrcs.forEach((src, offset) => {
+          const imageIndex = offset + 1;
+
+          const img = document.createElement("img");
+          img.src = src;
+          img.alt = `${altText} – billede ${imageIndex + 1}`;
+          img.decoding = "async";
+          // fetchPriority 
+          (img as HTMLImageElement & { fetchPriority?: string }).fetchPriority =
+            "low";
+          img.className =
+            "absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ease-in-out opacity-0";
+          img.dataset.likeImage = "true";
+          img.dataset.index = String(imageIndex);
+
+          container?.appendChild(img);
+          images.push(img);
+        });
+      }
+
+      function showNextImage(): void {
         if (images.length <= 1) return;
 
-        let currentImageIndex = 0;
+        currentImageIndex = (currentImageIndex + 1) % images.length;
+        showImage(currentImageIndex);
+      }
 
-        function showImage(index: number): void {
-          images.forEach((image, imageIndex) => {
-            const isVisible = imageIndex === index;
-
-            image.classList.toggle(
-              "opacity-100",
-              isVisible,
-            );
-
-            image.classList.toggle(
-              "opacity-0",
-              !isVisible,
-            );
-          });
+      card.addEventListener("pointerenter", (event) => {
+        if (event.pointerType === "mouse") {
+          showNextImage();
         }
-
-        function showNextImage(): void {
-          currentImageIndex =
-            (currentImageIndex + 1) % images.length;
-
-          showImage(currentImageIndex);
-        }
-
-        card.addEventListener("pointerenter", (event) => {
-            if (event.pointerType === "mouse") {
-                showNextImage();
-            }
-        });
-        card.addEventListener("click", showNextImage);
       });
+      card.addEventListener("click", showNextImage);
+
+      const observer = new IntersectionObserver(
+        (entries, obs) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              loadExtraImagesIfNeeded();
+              obs.unobserve(card);
+            }
+          });
+        },
+        { rootMargin: "200px" },
+      );
+
+      observer.observe(card);
+    });
   }
 
   initialiseLikeCards();
 
-  document.addEventListener(
-    "astro:page-load",
-    initialiseLikeCards,
-  );
+  document.addEventListener("astro:page-load", initialiseLikeCards);
 </script>
