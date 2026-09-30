@@ -40,10 +40,7 @@ const likes: readonly Like[] = [
     img: [kaffe1, kaffe2],
     text: "Coffee",
   },
-  {
-    img: [rejse1, rejse2],
-    text: "Traveling",
-  },
+
 ];
 
 export const likearray = Object.freeze(likes);

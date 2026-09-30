@@ -3,6 +3,7 @@ export type Case = Readonly<{
   titel: string;
   date: string;
   video: string;
+  youtube?: string;
   text: readonly string[];
   displayText: string;
   imgdisplay: readonly string[];
@@ -12,6 +13,7 @@ export type Case = Readonly<{
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const LOCAL_ASSET_PATTERN = /^\/[a-zA-Z0-9/_-]+\.(?:avif|gif|jpe?g|mp4|png|webm)$/;
+const YOUTUBE_ID_PATTERN = /^[\w-]{11}$/;
 
 function assertSafeExternalUrl(value: string, label: string): void {
   const parsed = new URL(value);
@@ -41,6 +43,10 @@ function validateCase(item: Case, index: number): Case {
     }
   }
 
+  if (item.youtube && !YOUTUBE_ID_PATTERN.test(item.youtube)) {
+    throw new Error(`${label}: ugyldigt YouTube-ID "${item.youtube}"`);
+  }
+
   if (item.url) assertSafeExternalUrl(item.url, `${label}.url`);
 
   return Object.freeze(item);
@@ -58,7 +64,7 @@ const cases: readonly Case[] = [
       "Conceptualization, design and coded solution of a visual design system, which ÅBEN can use to create label designs for their many different beers.",
     ],
     displayText:
-      "Conceptualization, design and coded solution of a visual design system, which ÅBEN can use to create label designs for their many different beers.",
+      "Conceptualization, design and coded solution of a visual design system, which ÅBEN can use to create label designs for their many beers.",
     imgdisplay: [
       "/cases/aaben/aaben01.png",
       "/cases/aaben/aaben02.png",
@@ -91,6 +97,27 @@ const cases: readonly Case[] = [
       "/cases/shecanplay/shecanplay9.png",
       "/cases/shecanplay/shecanplay5.png",
       "/cases/shecanplay/shecanplay7.png",
+    ],
+  },
+  {
+    slug: "blowme",
+    titel: `Blowme: A Snapchat Breathalyzer`,
+    date: "2026-09-18",
+    programs: ["Arguino IDE", "After Effects"],
+    video: "/cases/blowme/blowme1.mp4",
+    youtube: "rJuzDmDSVyw",
+    text: [
+      "Blowme is a conceptual product developed for Snapchat, designed to help young people become more aware of their alcohol consumption in a fun and relatable way.",
+      "The project is based on field research at Ungdommens Folkemøde, which showed that alcohol often works as a shortcut to social confidence at parties, and that this confidence can quickly tip over into embarrassing situations.",
+      "The project explores how alcohol awareness can be communicated through social skills rather than abstract numbers.",
+      "The concept was developed in a interdisciplinary group. My role was the technical part of the project. I evaluated the possibilities and limitations of the concept and built a physical breathalyzer prototype that translates a BAC reading into real party situations and words describing how alcohol affects behavior."
+    ],
+    displayText:
+      "Blowme is a conceptual product developed for Snapchat, designed to help young people become more aware of their alcohol consumption.",
+    imgdisplay: [
+      "/cases/blowme/blowme1.png",
+      "/cases/blowme/blowme2.png",
+      
     ],
   },
   {

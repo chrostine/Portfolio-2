@@ -22,7 +22,7 @@ interface Props {
 }
 
 const { caseData } = Astro.props;
-const { titel, video, text, imgdisplay, date, programs, url } = caseData;
+const { titel, video, youtube, text, imgdisplay, date, programs, url } = caseData;
 const transitionName = `case-img-${caseData.slug}`;
 ---
 
@@ -67,8 +67,26 @@ const transitionName = `case-img-${caseData.slug}`;
           </Brodtekst>
         </div>
       </div>
+      
+      <div>
+        {youtube && (
+        <div class="pb-4">
+          <div class="aspect-video w-full">
+            <iframe
+            src={`https://www.youtube-nocookie.com/embed/${youtube}`}
+            title={`${titel} video`}
+            class="h-full w-full"
+            loading="lazy"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+            ></iframe>
+          </div>
+        </div>
+        )}
 
-      <Img images={imgdisplay} title={titel} />
+        <Img images={imgdisplay} title={titel} />
+      </div>
     </main>
 
     <Footer />
